@@ -1,9 +1,10 @@
 package com.android.max_launcher.features;
 
 import android.content.ComponentName;
-import java.util.HashSet;
+
 import com.android.max_launcher.AppFilter;
-import com.android.max_launcher.Launcher;
+
+import java.util.HashSet;
 
 public class LauncherAppFilter extends AppFilter {
     private final HashSet mHide;
