@@ -3,6 +3,8 @@
 
 **Launcher based on Launcher3 from AOSP** <p align="center"><img width="128" height="128" src="images/icon.png" /></p>
 
+--------
+
 ![Screenshots](./images/screenshots.png?raw=true)
 
 --------
