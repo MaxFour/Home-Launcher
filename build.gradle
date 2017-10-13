@@ -13,13 +13,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.protobuf'
 
 android {
-    signingConfigs {
-        MaxKey {
-            keyAlias 'max'
-            keyPassword 'mmm789'
-            storeFile file('C:/Users/Максуд/.android/max.jks')
-        }
-    }
     compileSdkVersion 26
     buildToolsVersion '26.0.1'
     defaultConfig {
@@ -33,13 +26,6 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-        }
-        release {
-            minifyEnabled false
-            shrinkResources false
-            useProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.MaxKey
         }
     }
     productFlavors {
