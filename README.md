@@ -1,4 +1,5 @@
-<h1>Launcher</h1><p align="right"><a href="https://android-arsenal.com/api?level=21"><img src="https://img.shields.io/badge/API-21%2B-orange.svg?style=flat"></a></p>
+# Launcher
+[![API](https://img.shields.io/badge/API-21%2B-orange.svg?style=flat)](https://android-arsenal.com/api?level=21)
 
 **Launcher based on Launcher3 from AOSP** <p align="center"><img width="128" height="128" src="images/icon.png" /></p>
 
