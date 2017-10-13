@@ -1,6 +1,6 @@
 # Launcher
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/MaxFour/Launcher/blob/master/LICENSE)
 [![API](https://img.shields.io/badge/API-21%2B-orange.svg?style=flat)](https://android-arsenal.com/api?level=21)
+[![Github Releases](https://img.shields.io/github/downloads/atom/atom/latest/total.svg)](https://github.com/MaxFour/Launcher/releases/download/1.0/Launcher-v.1.0.apk)
 
 **Launcher based on Launcher3 from AOSP**
 
@@ -22,3 +22,5 @@
 - Removed search bar
 - Disabled Google Now feed on the left of the normal workspace
 - Default grid size 5x5
+
+**Only English and Russian languages!**
