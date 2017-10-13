@@ -1,7 +1,7 @@
 # Launcher
 [![API](https://img.shields.io/badge/API-21%2B-orange.svg?style=flat)](https://android-arsenal.com/api?level=21)
 
-**Launcher based on Launcher3 from AOSP** ![Icon](./images/icon.png?raw=true){ float: right; }
+**Launcher based on Launcher3 from AOSP** ![Icon](./images/icon.png?raw=true){:style="float: right;margin-right;"}
 
 ![Screenshots](./images/screenshots.png?raw=true)
 
