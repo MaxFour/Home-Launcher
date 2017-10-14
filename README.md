@@ -28,4 +28,4 @@
 
 # Donate
 
-<iframe src="https://funding.wmtransfer.com/widgets/vertical/bfebb1e8-60c0-444d-8b3f-5debb0e1936e?bt=0&hs=1&sum=1" width="240" height="240" scrolling="no" style="border:none;"></iframe>
+<iframe src="https://funding.wmtransfer.com/widgets/vertical/bfebb1e8-60c0-444d-8b3f-5debb0e1936e?bt=0&hs=1&sum=1" width="240" height="240" scrolling="no" style="border:none;">Donate</iframe>
