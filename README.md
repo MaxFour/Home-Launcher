@@ -1,5 +1,5 @@
 # Launcher
-[![API](https://img.shields.io/badge/API-21%2B-orange.svg?style=flat)](https://android-arsenal.com/api?level=21)
+[![API](https://img.shields.io/badge/API-21%2B-orange.svg?style=flat)](https://android-arsenal.com/api?level=21)[![Donate](https://img.shields.io/badge/Donate-WebMoney-blue.svg)](https://funding.wmtransfer.com/widgets/vertical/bfebb1e8-60c0-444d-8b3f-5debb0e1936e?bt=0&hs=1&sum=1 "Donate")
 
 **Launcher based on Launcher3 from AOSP** <p align="center"><img width="128" height="128" src="images/icon.png" /></p>
 
