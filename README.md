@@ -26,6 +26,4 @@
 
 **Only English and Russian languages!**
 
-# Donate
-
-<iframe width="240" height="240" src="https://funding.wmtransfer.com/widgets/vertical/bfebb1e8-60c0-444d-8b3f-5debb0e1936e?bt=0&hs=1&sum=1" frameborder="0" allowfullscreen></iframe>
+[<img scr="https://img.shields.io/badge/Donate-WebMoney-blue.svg"](https://funding.wmtransfer.com/widgets/vertical/bfebb1e8-60c0-444d-8b3f-5debb0e1936e?bt=0&hs=1&sum=1 "Donate")
