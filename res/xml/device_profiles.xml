@@ -15,21 +15,21 @@
      limitations under the License.
 -->
 
-<profiles xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.home" >
+<profiles xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.max_launcher" >
 
     <profile
-        launcher:name="Default"
-        launcher:minWidthDps="296"
-        launcher:minHeightDps="496"
+        launcher:name="LG G3s"
+        launcher:minWidthDps="296.0"
+        launcher:minHeightDps="496.0"
         launcher:numRows="5"
         launcher:numColumns="5"
         launcher:numFolderRows="4"
         launcher:numFolderColumns="4"
         launcher:minAllAppsPredictionColumns="5"
-        launcher:iconSize="55"
-        launcher:iconTextSize="12.0"
+        launcher:iconSize="55.0"
+        launcher:iconTextSize="13.0"
         launcher:numHotseatIcons="5"
-        launcher:hotseatIconSize="55"
+        launcher:hotseatIconSize="55.0"
         launcher:defaultLayoutId="@xml/default_workspace_5x5"
         />
 

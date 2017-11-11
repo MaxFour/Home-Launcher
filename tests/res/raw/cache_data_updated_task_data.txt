@@ -1,6 +1,6 @@
 # Model data used by CacheDataUpdatedTaskTest
 
-classMap s com.android.home.ShortcutInfo
+classMap s com.android.max_launcher.ShortcutInfo
 
 # Items for the BgDataModel
 

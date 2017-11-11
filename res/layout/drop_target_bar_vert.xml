@@ -14,7 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.android.home.DropTargetBar
+<com.android.max_launcher.DropTargetBar
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/dynamic_grid_drop_target_size"
     android:orientation="vertical"
@@ -24,7 +24,7 @@
     android:paddingTop="@dimen/vert_drop_target_vertical_gap" >
 
     <!-- Delete target -->
-    <com.android.home.DeleteDropTarget
+    <com.android.max_launcher.DeleteDropTarget
         android:layout_width="match_parent"
         android:layout_height="@dimen/dynamic_grid_drop_target_size"
         android:gravity="center"
@@ -34,7 +34,7 @@
         android:textColor="@android:color/white" />
 
     <!-- Uninstall target -->
-    <com.android.home.UninstallDropTarget
+    <com.android.max_launcher.UninstallDropTarget
         android:layout_width="match_parent"
         android:layout_height="@dimen/dynamic_grid_drop_target_size"
         android:gravity="center"
@@ -50,7 +50,7 @@
         android:layout_weight="1" />
 
     <!-- App Info -->
-    <com.android.home.InfoDropTarget
+    <com.android.max_launcher.InfoDropTarget
         android:layout_width="match_parent"
         android:layout_height="@dimen/dynamic_grid_drop_target_size"
         android:gravity="center"
@@ -60,4 +60,4 @@
         android:textColor="@android:color/white"
         android:layout_marginBottom="64dp"/>
 
-</com.android.home.DropTargetBar>
+</com.android.max_launcher.DropTargetBar>

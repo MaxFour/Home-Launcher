@@ -16,7 +16,7 @@
 <!-- The top and bottom paddings are defined in this container, but since we want
      the list view to span the full width (for touch interception purposes), we
      will bake the left/right padding into that view's background itself. -->
-<com.android.home.allapps.AllAppsContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.android.max_launcher.allapps.AllAppsContainerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
     android:id="@+id/apps_view"
     android:layout_width="match_parent"
@@ -33,7 +33,7 @@
         android:visibility="invisible" />
 
 
-    <com.android.home.allapps.AllAppsRecyclerViewContainerView
+    <com.android.max_launcher.allapps.AllAppsRecyclerViewContainerView
         android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -44,7 +44,7 @@
         android:visibility="gone">
 
         <!-- DO NOT CHANGE THE ID -->
-        <com.android.home.allapps.AllAppsRecyclerView
+        <com.android.max_launcher.allapps.AllAppsRecyclerView
             android:id="@+id/apps_list_view"
             android:layout_below="@+id/search_container"
             android:layout_width="match_parent"
@@ -73,7 +73,7 @@
             android:orientation="horizontal"
             android:saveEnabled="false">
 
-            <com.android.home.ExtendedEditText
+            <com.android.max_launcher.ExtendedEditText
                 android:id="@+id/search_box_input"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/all_apps_search_bar_field_height"
@@ -92,7 +92,7 @@
                 android:textSize="16sp" />
         </FrameLayout>
 
-    </com.android.home.allapps.AllAppsRecyclerViewContainerView>
+    </com.android.max_launcher.allapps.AllAppsRecyclerViewContainerView>
     <View
         style="@style/AllAppsNavBarProtection"
         android:id="@+id/nav_bar_bg"
@@ -101,4 +101,4 @@
         android:layout_gravity="bottom"
         android:focusable="false"
         android:visibility="invisible" />
-</com.android.home.allapps.AllAppsContainerView>
+</com.android.max_launcher.allapps.AllAppsContainerView>

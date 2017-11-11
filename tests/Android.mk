@@ -20,8 +20,8 @@ LOCAL_MODULE_TAGS := tests
 LOCAL_STATIC_JAVA_LIBRARIES := \
 	android-support-test \
 	ub-uiautomator \
-	legacy-android-test \
-	mockito-target-minus-junit4
+	mockito-target-minus-junit4 \
+	legacy-android-test
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_FULL_LIBS_MANIFEST_FILES := $(LOCAL_PATH)/AndroidManifest-common.xml
@@ -29,8 +29,8 @@ LOCAL_FULL_LIBS_MANIFEST_FILES := $(LOCAL_PATH)/AndroidManifest-common.xml
 LOCAL_SDK_VERSION := current
 LOCAL_MIN_SDK_VERSION := 21
 
-LOCAL_PACKAGE_NAME := HomeTests
+LOCAL_PACKAGE_NAME := max_launcherTests
 
-LOCAL_INSTRUMENTATION_FOR := Home
+LOCAL_INSTRUMENTATION_FOR := max_launcher
 
 include $(BUILD_PACKAGE)

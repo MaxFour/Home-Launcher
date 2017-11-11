@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<com.android.home.AppWidgetResizeFrame
+<com.android.max_launcher.AppWidgetResizeFrame
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -54,4 +54,4 @@
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="@dimen/widget_handle_margin" />
 
-</com.android.home.AppWidgetResizeFrame>
+</com.android.max_launcher.AppWidgetResizeFrame>

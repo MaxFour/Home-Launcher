@@ -15,7 +15,7 @@
  */
 syntax = "proto2";
 
-option java_package = "com.android.home.model.nano";
+option java_package = "com.android.max_launcher.model.nano";
 option java_outer_classname = "LauncherDumpProto";
 
 package model;

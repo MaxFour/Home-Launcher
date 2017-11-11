@@ -36,7 +36,7 @@
         android:background="?android:attr/colorPrimaryDark"
         android:layout_height="wrap_content">
 
-        <com.android.home.dragndrop.LivePreviewWidgetCell
+        <com.android.max_launcher.dragndrop.LivePreviewWidgetCell
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -49,7 +49,7 @@
 
             <include layout="@layout/widget_cell_content"  />
 
-        </com.android.home.dragndrop.LivePreviewWidgetCell>
+        </com.android.max_launcher.dragndrop.LivePreviewWidgetCell>
     </FrameLayout>
 
     <LinearLayout

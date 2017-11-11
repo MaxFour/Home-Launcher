@@ -2,6 +2,6 @@
 <full-backup-content xmlns:android="http://schemas.android.com/apk/res/android">
 
     <include domain="database" path="launcher.db" />
-    <include domain="sharedpref" path="com.android.home.prefs.xml" />
+    <include domain="sharedpref" path="com.android.max_launcher.prefs.xml" />
 
 </full-backup-content>

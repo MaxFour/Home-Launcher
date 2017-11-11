@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<com.android.home.notification.NotificationItemView
+<com.android.max_launcher.notification.NotificationItemView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/notification_view"
     android:layout_width="@dimen/bg_popup_item_width"
@@ -78,4 +78,4 @@
 
     </RelativeLayout>
 
-</com.android.home.notification.NotificationItemView>
+</com.android.max_launcher.notification.NotificationItemView>
