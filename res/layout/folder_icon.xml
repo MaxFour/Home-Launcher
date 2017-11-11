@@ -14,17 +14,17 @@
      limitations under the License.
 -->
 
-<com.android.max_launcher.folder.FolderIcon
+<com.android.home.folder.FolderIcon
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:focusable="true" >
-    <com.android.max_launcher.BubbleTextView
+    <com.android.home.BubbleTextView
         style="@style/BaseIcon.Workspace"
         android:id="@+id/folder_icon_name"
         android:focusable="false"
         android:layout_gravity="top"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-</com.android.max_launcher.folder.FolderIcon>
+</com.android.home.folder.FolderIcon>

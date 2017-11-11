@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<com.android.max_launcher.shortcuts.ShortcutsItemView
+<com.android.home.shortcuts.ShortcutsItemView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/shortcuts_view"
     android:layout_width="@dimen/bg_popup_item_width"
@@ -29,4 +29,4 @@
         android:orientation="vertical">
     </LinearLayout>
 
-</com.android.max_launcher.shortcuts.ShortcutsItemView>
+</com.android.home.shortcuts.ShortcutsItemView>

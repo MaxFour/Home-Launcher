@@ -15,7 +15,7 @@
 -->
 
 <!-- Full screen view projects under the status bar and contains the background -->
-<com.android.max_launcher.LauncherRootView
+<com.android.home.LauncherRootView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
 
@@ -24,7 +24,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.android.max_launcher.dragndrop.DragLayer
+    <com.android.home.dragndrop.DragLayer
         android:id="@+id/drag_layer"
         android:clipChildren="false"
         android:importantForAccessibility="no"
@@ -35,13 +35,13 @@
 
         <!-- The workspace contains 5 screens of cells -->
         <!-- DO NOT CHANGE THE ID -->
-        <com.android.max_launcher.Workspace
+        <com.android.home.Workspace
             android:id="@+id/workspace"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             launcher:pageIndicator="@+id/page_indicator">
-        </com.android.max_launcher.Workspace>
+        </com.android.home.Workspace>
 
         <!-- DO NOT CHANGE THE ID -->
         <include layout="@layout/hotseat"
@@ -78,6 +78,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible" />
-    </com.android.max_launcher.dragndrop.DragLayer>
+    </com.android.home.dragndrop.DragLayer>
 
-</com.android.max_launcher.LauncherRootView>
+</com.android.home.LauncherRootView>

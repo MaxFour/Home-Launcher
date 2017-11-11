@@ -14,7 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.android.max_launcher.folder.Folder xmlns:android="http://schemas.android.com/apk/res/android"
+<com.android.home.folder.Folder xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
     android:elevation="5dp"
     android:orientation="vertical" >
 
-    <com.android.max_launcher.folder.FolderPagedView
+    <com.android.home.folder.FolderPagedView
         android:id="@+id/folder_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -40,7 +40,7 @@
         android:paddingLeft="12dp"
         android:paddingRight="12dp" >
 
-        <com.android.max_launcher.ExtendedEditText
+        <com.android.home.ExtendedEditText
             android:id="@+id/folder_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
             android:textColorHint="?android:attr/textColorHint"
             android:textSize="@dimen/folder_label_text_size" />
 
-        <com.android.max_launcher.pageindicators.PageIndicatorDots
+        <com.android.home.pageindicators.PageIndicatorDots
             android:id="@+id/folder_page_indicator"
             android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
@@ -70,4 +70,4 @@
 
     </LinearLayout>
 
-</com.android.max_launcher.folder.Folder>
+</com.android.home.folder.Folder>

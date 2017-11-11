@@ -13,13 +13,13 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.android.max_launcher.Hotseat
+<com.android.home.Hotseat
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:launcher="http://schemas.android.com/apk/res-auto">
-    <com.android.max_launcher.CellLayout
+    <com.android.home.CellLayout
         android:id="@+id/layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         launcher:containerType="hotseat" />
-</com.android.max_launcher.Hotseat>
+</com.android.home.Hotseat>
