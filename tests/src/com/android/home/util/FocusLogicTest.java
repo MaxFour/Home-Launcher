@@ -19,6 +19,9 @@ package com.android.home.util;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.view.KeyEvent;
+import android.view.View;
+
+import com.android.home.util.FocusLogic;
 
 /**
  * Tests the {@link FocusLogic} class that handles key event based focus handling.

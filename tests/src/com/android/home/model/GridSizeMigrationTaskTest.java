@@ -9,9 +9,9 @@ import android.test.suitebuilder.annotation.MediumTest;
 
 import com.android.home.InvariantDeviceProfile;
 import com.android.home.LauncherModel;
+import com.android.home.LauncherProvider;
 import com.android.home.LauncherSettings;
 import com.android.home.config.FeatureFlags;
-import com.android.home.config.ProviderConfig;
 import com.android.home.model.GridSizeMigrationTask.MultiStepMigrationTask;
 import com.android.home.util.TestLauncherProvider;
 
@@ -39,7 +39,7 @@ public class GridSizeMigrationTaskTest extends ProviderTestCase2<TestLauncherPro
     private InvariantDeviceProfile mIdp;
 
     public GridSizeMigrationTaskTest() {
-        super(TestLauncherProvider.class, ProviderConfig.AUTHORITY);
+        super(TestLauncherProvider.class, LauncherProvider.AUTHORITY);
     }
 
     @Override

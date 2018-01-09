@@ -17,8 +17,8 @@
 package com.android.home.accessibility;
 
 import com.android.home.CellLayout;
-import com.android.home.folder.FolderPagedView;
 import com.android.home.R;
+import com.android.home.folder.FolderPagedView;
 
 /**
  * Implementation of {@link DragAndDropAccessibilityDelegate} to support DnD in a folder.

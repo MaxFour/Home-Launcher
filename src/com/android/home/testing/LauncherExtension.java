@@ -10,8 +10,8 @@ import android.widget.FrameLayout;
 import com.android.home.AppInfo;
 import com.android.home.Launcher;
 import com.android.home.LauncherCallbacks;
-import com.android.home.allapps.AllAppsSearchBarController;
 import com.android.home.util.ComponentKey;
+import com.android.home.util.ComponentKeyMapper;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -198,12 +198,7 @@ public class LauncherExtension extends Launcher {
         }
 
         @Override
-        public AllAppsSearchBarController getAllAppsSearchBarController() {
-            return null;
-        }
-
-        @Override
-        public List<ComponentKey> getPredictedApps() {
+        public List<ComponentKeyMapper<AppInfo>> getPredictedApps() {
             // To debug app predictions, enable AlphabeticalAppsList#DEBUG_PREDICTIONS
             return new ArrayList<>();
         }
@@ -214,21 +209,11 @@ public class LauncherExtension extends Launcher {
         }
 
         @Override
-        public void setLauncherSearchCallback(Object callbacks) {
-            // Do nothing
-        }
-
-        @Override
         public void onAttachedToWindow() {
         }
 
         @Override
         public void onDetachedFromWindow() {
-        }
-
-        @Override
-        public boolean shouldShowDiscoveryBounce() {
-            return false;
         }
     }
 }

@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.android.home.Utilities;
-import com.android.home.config.ProviderConfig;
+import com.android.home.config.FeatureFlags;
 
 /**
  * An extension of {@link SQLiteOpenHelper} with utility methods for a single table cache DB.
@@ -19,7 +19,7 @@ import com.android.home.config.ProviderConfig;
 public abstract class SQLiteCacheHelper {
     private static final String TAG = "SQLiteCacheHelper";
 
-    private static final boolean NO_ICON_CACHE = ProviderConfig.IS_DOGFOOD_BUILD &&
+    private static final boolean NO_ICON_CACHE = FeatureFlags.IS_DOGFOOD_BUILD &&
             Utilities.isPropertyEnabled(LogConfig.MEMORY_ONLY_ICON_CACHE);
 
     private final String mTableName;

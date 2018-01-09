@@ -27,9 +27,9 @@ import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.view.View;
 
+import com.android.home.AbstractFloatingView;
 import com.android.home.Launcher;
 import com.android.home.LauncherAppState;
-import com.android.home.Utilities;
 import com.android.home.graphics.IconPalette;
 import com.android.home.popup.PopupContainerWithArrow;
 import com.android.home.util.PackageUserKey;
@@ -66,7 +66,7 @@ public class NotificationInfo implements View.OnClickListener {
         title = notification.extras.getCharSequence(Notification.EXTRA_TITLE);
         text = notification.extras.getCharSequence(Notification.EXTRA_TEXT);
 
-        if (Utilities.isAtLeastO()) mBadgeIcon = notification.getBadgeIconType();
+        mBadgeIcon = notification.getBadgeIconType();
         // Load the icon. Since it is backed by ashmem, we won't copy the entire bitmap
         // into our process as long as we don't touch it and it exists in systemui.
         Icon icon = mBadgeIcon == Notification.BADGE_ICON_SMALL ? null : notification.getLargeIcon();
@@ -94,6 +94,9 @@ public class NotificationInfo implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+        if (intent == null) {
+            return;
+        }
         final Launcher launcher = Launcher.getLauncher(view.getContext());
         Bundle activityOptions = ActivityOptions.makeClipRevealAnimation(
                 view, 0, 0, view.getWidth(), view.getHeight()).toBundle();
@@ -106,7 +109,8 @@ public class NotificationInfo implements View.OnClickListener {
         if (autoCancel) {
             launcher.getPopupDataProvider().cancelNotification(notificationKey);
         }
-        PopupContainerWithArrow.getOpen(launcher).close(true);
+        AbstractFloatingView.closeOpenContainer(launcher, AbstractFloatingView
+                .TYPE_POPUP_CONTAINER_WITH_ARROW);
     }
 
     public Drawable getIconForBackground(Context context, int background) {

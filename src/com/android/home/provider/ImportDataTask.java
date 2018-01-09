@@ -16,6 +16,8 @@
 
 package com.android.home.provider;
 
+import static com.android.home.Utilities.getDevicePrefs;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,14 +31,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Process;
 import android.text.TextUtils;
+import android.util.ArrayMap;
 import android.util.LongSparseArray;
 import android.util.SparseBooleanArray;
-
 import com.android.home.AutoInstallsLayout.LayoutParserCallback;
 import com.android.home.DefaultLayoutParser;
 import com.android.home.LauncherAppState;
 import com.android.home.LauncherAppWidgetInfo;
-import com.android.home.LauncherFiles;
+import com.android.home.LauncherProvider;
 import com.android.home.LauncherSettings;
 import com.android.home.LauncherSettings.Favorites;
 import com.android.home.LauncherSettings.Settings;
@@ -46,14 +48,11 @@ import com.android.home.Utilities;
 import com.android.home.Workspace;
 import com.android.home.compat.UserManagerCompat;
 import com.android.home.config.FeatureFlags;
-import com.android.home.config.ProviderConfig;
 import com.android.home.logging.FileLog;
 import com.android.home.model.GridSizeMigrationTask;
 import com.android.home.util.LongArrayMap;
-
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -112,7 +111,7 @@ public class ImportDataTask {
             screenOps.add(ContentProviderOperation.newInsert(
                     LauncherSettings.WorkspaceScreens.CONTENT_URI).withValues(v).build());
         }
-        mContext.getContentResolver().applyBatch(ProviderConfig.AUTHORITY, screenOps);
+        mContext.getContentResolver().applyBatch(LauncherProvider.AUTHORITY, screenOps);
         importWorkspaceItems(allScreens.get(0), screenIdMap);
 
         GridSizeMigrationTask.markForMigration(mContext, mMaxGridSizeX, mMaxGridSizeY, mHotseatSize);
@@ -133,7 +132,7 @@ public class ImportDataTask {
         String profileId = Long.toString(UserManagerCompat.getInstance(mContext)
                 .getSerialNumberForUser(Process.myUserHandle()));
 
-        boolean createEmptyRowOnFirstScreen = false;
+        boolean createEmptyRowOnFirstScreen;
         if (FeatureFlags.QSB_ON_FIRST_SCREEN) {
             try (Cursor c = mContext.getContentResolver().query(mOtherFavoritesUri, null,
                     // get items on the first row of the first screen
@@ -289,7 +288,7 @@ public class ImportDataTask {
                 }
 
                 if (insertOperations.size() >= BATCH_INSERT_SIZE) {
-                    mContext.getContentResolver().applyBatch(ProviderConfig.AUTHORITY,
+                    mContext.getContentResolver().applyBatch(LauncherProvider.AUTHORITY,
                             insertOperations);
                     insertOperations.clear();
                 }
@@ -300,7 +299,7 @@ public class ImportDataTask {
             throw new Exception("Insufficient data");
         }
         if (!insertOperations.isEmpty()) {
-            mContext.getContentResolver().applyBatch(ProviderConfig.AUTHORITY,
+            mContext.getContentResolver().applyBatch(LauncherProvider.AUTHORITY,
                     insertOperations);
             insertOperations.clear();
         }
@@ -319,15 +318,15 @@ public class ImportDataTask {
             mHotseatSize = (int) hotseatItems.keyAt(hotseatItems.size() - 1) + 1;
 
             if (!insertOperations.isEmpty()) {
-                mContext.getContentResolver().applyBatch(ProviderConfig.AUTHORITY,
+                mContext.getContentResolver().applyBatch(LauncherProvider.AUTHORITY,
                         insertOperations);
             }
         }
     }
 
-    private static final String getPackage(Intent intent) {
+    private static String getPackage(Intent intent) {
         return intent.getComponent() != null ? intent.getComponent().getPackageName()
-                : intent.getPackage();
+            : intent.getPackage();
     }
 
     /**
@@ -377,10 +376,6 @@ public class ImportDataTask {
         return false;
     }
 
-    private static SharedPreferences getDevicePrefs(Context c) {
-        return c.getSharedPreferences(LauncherFiles.DEVICE_PREFERENCES_KEY, Context.MODE_PRIVATE);
-    }
-
     private static final int getMyHotseatLayoutId(Context context) {
         if (LauncherAppState.getIDP(context).numHotseatIcons <= 5) return R.xml.dw_phone_hotseat;
         else return R.xml.dw_phone_hotseat;
@@ -395,9 +390,9 @@ public class ImportDataTask {
         }
 
         @Override
-        protected HashMap<String, TagParser> getLayoutElementsMap() {
+        protected ArrayMap<String, TagParser> getLayoutElementsMap() {
             // Only allow shortcut parsers
-            HashMap<String, TagParser> parsers = new HashMap<String, TagParser>();
+            ArrayMap<String, TagParser> parsers = new ArrayMap<>();
             parsers.put(TAG_FAVORITE, new AppShortcutWithUriParser());
             parsers.put(TAG_SHORTCUT, new UriShortcutParser(mSourceRes));
             parsers.put(TAG_RESOLVE, new ResolveParser());
@@ -409,7 +404,7 @@ public class ImportDataTask {
      * {@link LayoutParserCallback} which adds items in empty hotseat spots.
      */
     private static class HotseatParserCallback implements LayoutParserCallback {
-        private final HashSet<String> mExisitingApps;
+        private final HashSet<String> mExistingApps;
         private final LongArrayMap<Object> mExistingItems;
         private final ArrayList<ContentProviderOperation> mOutOps;
         private final int mRequiredSize;
@@ -418,7 +413,7 @@ public class ImportDataTask {
         HotseatParserCallback(
                 HashSet<String> existingApps, LongArrayMap<Object> existingItems,
                 ArrayList<ContentProviderOperation> outOps, int startItemId, int requiredSize) {
-            mExisitingApps = existingApps;
+            mExistingApps = existingApps;
             mExistingItems = existingItems;
             mOutOps = outOps;
             mRequiredSize = requiredSize;
@@ -443,11 +438,11 @@ public class ImportDataTask {
                 return 0;
             }
             String pkg = getPackage(intent);
-            if (pkg == null || mExisitingApps.contains(pkg)) {
+            if (pkg == null || mExistingApps.contains(pkg)) {
                 // The item does not target an app or is already in hotseat.
                 return 0;
             }
-            mExisitingApps.add(pkg);
+            mExistingApps.add(pkg);
 
             // find next vacant spot.
             long screen = 0;

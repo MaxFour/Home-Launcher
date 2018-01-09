@@ -18,7 +18,6 @@ import com.android.home.AppInfo;
 import com.android.home.AppWidgetResizeFrame;
 import com.android.home.BubbleTextView;
 import com.android.home.CellLayout;
-import com.android.home.popup.PopupContainerWithArrow;
 import com.android.home.DeleteDropTarget;
 import com.android.home.DropTarget.DragObject;
 import com.android.home.FolderInfo;
@@ -36,6 +35,7 @@ import com.android.home.Workspace;
 import com.android.home.dragndrop.DragController.DragListener;
 import com.android.home.dragndrop.DragOptions;
 import com.android.home.folder.Folder;
+import com.android.home.popup.PopupContainerWithArrow;
 import com.android.home.shortcuts.DeepShortcutManager;
 import com.android.home.util.Thunk;
 
@@ -173,7 +173,7 @@ public class LauncherAccessibilityDelegate extends AccessibilityDelegate impleme
 
                         ArrayList<ItemInfo> itemList = new ArrayList<>();
                         itemList.add(info);
-                        mLauncher.bindItems(itemList, 0, itemList.size(), true);
+                        mLauncher.bindItems(itemList, true);
                     } else if (item instanceof PendingAddItemInfo) {
                         PendingAddItemInfo info = (PendingAddItemInfo) item;
                         Workspace workspace = mLauncher.getWorkspace();
@@ -205,7 +205,7 @@ public class LauncherAccessibilityDelegate extends AccessibilityDelegate impleme
                 public void run() {
                     ArrayList<ItemInfo> itemList = new ArrayList<>();
                     itemList.add(item);
-                    mLauncher.bindItems(itemList, 0, itemList.size(), true);
+                    mLauncher.bindItems(itemList, true);
                     announceConfirmation(R.string.item_moved);
                 }
             });

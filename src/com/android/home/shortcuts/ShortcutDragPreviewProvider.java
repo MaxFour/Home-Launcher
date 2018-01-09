@@ -23,10 +23,10 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.android.home.graphics.HolographicOutlineHelper;
 import com.android.home.Launcher;
 import com.android.home.Utilities;
 import com.android.home.graphics.DragPreviewProvider;
+import com.android.home.graphics.HolographicOutlineHelper;
 
 /**
  * Extension of {@link DragPreviewProvider} which generates bitmaps scaled to the default icon size.

@@ -10,9 +10,9 @@ import android.net.Uri;
 import android.util.Pair;
 
 import com.android.home.ItemInfo;
+import com.android.home.LauncherProvider;
 import com.android.home.LauncherSettings;
 import com.android.home.ShortcutInfo;
-import com.android.home.config.ProviderConfig;
 import com.android.home.util.GridOccupancy;
 import com.android.home.util.LongArrayMap;
 import com.android.home.util.Provider;
@@ -20,8 +20,9 @@ import com.android.home.util.Provider;
 import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,7 +51,11 @@ public class AddWorkspaceItemsTaskTest extends BaseModelUpdateTaskTestCase {
     }
 
     private AddWorkspaceItemsTask newTask(ItemInfo... items) {
-        return new AddWorkspaceItemsTask(Provider.of(Arrays.asList(items))) {
+        List<Pair<ItemInfo, Object>> list = new ArrayList<>();
+        for (ItemInfo item : items) {
+            list.add(Pair.create(item, null));
+        }
+        return new AddWorkspaceItemsTask(Provider.of(list)) {
 
             @Override
             protected void updateScreens(Context context, ArrayList<Long> workspaceScreens) { }
@@ -126,7 +131,7 @@ public class AddWorkspaceItemsTaskTest extends BaseModelUpdateTaskTestCase {
         // only info2 should be added because info was already added to the workspace
         // in setupWorkspaceWithHoles()
         verify(callbacks).bindAppsAdded(any(ArrayList.class), notAnimated.capture(),
-                animated.capture(), any(ArrayList.class));
+                animated.capture());
         assertTrue(notAnimated.getValue().isEmpty());
 
         assertEquals(1, animated.getValue().size());
@@ -178,6 +183,6 @@ public class AddWorkspaceItemsTaskTest extends BaseModelUpdateTaskTestCase {
             v.put(LauncherSettings.WorkspaceScreens.SCREEN_RANK, i);
             ops.add(ContentProviderOperation.newInsert(uri).withValues(v).build());
         }
-        getMockContentResolver().applyBatch(ProviderConfig.AUTHORITY, ops);
+        getMockContentResolver().applyBatch(LauncherProvider.AUTHORITY, ops);
     }
 }

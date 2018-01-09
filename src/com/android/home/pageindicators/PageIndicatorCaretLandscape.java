@@ -48,9 +48,7 @@ public class PageIndicatorCaretLandscape extends PageIndicator {
         setCaretDrawable(caretDrawable);
 
         Launcher l = Launcher.getLauncher(context);
-        setOnTouchListener(l.getHapticFeedbackTouchListener());
         setOnClickListener(l);
-        setOnLongClickListener(l);
         setOnFocusChangeListener(l.mFocusHandler);
     }
 
@@ -58,7 +56,7 @@ public class PageIndicatorCaretLandscape extends PageIndicator {
     protected void onDraw(Canvas canvas) {
         Rect drawableBounds = getCaretDrawable().getBounds();
         int count = canvas.save();
-        canvas.translate(getWidth() - drawableBounds.width(),
+        canvas.translate((getWidth() - drawableBounds.width()) / 2,
                 getHeight() - drawableBounds.height());
         getCaretDrawable().draw(canvas);
         canvas.restoreToCount(count);

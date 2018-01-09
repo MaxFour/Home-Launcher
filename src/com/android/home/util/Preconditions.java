@@ -19,7 +19,7 @@ package com.android.home.util;
 import android.os.Looper;
 
 import com.android.home.LauncherModel;
-import com.android.home.config.ProviderConfig;
+import com.android.home.config.FeatureFlags;
 
 /**
  * A set of utility methods for thread verification.
@@ -27,25 +27,25 @@ import com.android.home.config.ProviderConfig;
 public class Preconditions {
 
     public static void assertNotNull(Object o) {
-        if (ProviderConfig.IS_DOGFOOD_BUILD && o == null) {
+        if (FeatureFlags.IS_DOGFOOD_BUILD && o == null) {
             throw new IllegalStateException();
         }
     }
 
     public static void assertWorkerThread() {
-        if (ProviderConfig.IS_DOGFOOD_BUILD && !isSameLooper(LauncherModel.getWorkerLooper())) {
+        if (FeatureFlags.IS_DOGFOOD_BUILD && !isSameLooper(LauncherModel.getWorkerLooper())) {
             throw new IllegalStateException();
         }
     }
 
     public static void assertUIThread() {
-        if (ProviderConfig.IS_DOGFOOD_BUILD && !isSameLooper(Looper.getMainLooper())) {
+        if (FeatureFlags.IS_DOGFOOD_BUILD && !isSameLooper(Looper.getMainLooper())) {
             throw new IllegalStateException();
         }
     }
 
     public static void assertNonUiThread() {
-        if (ProviderConfig.IS_DOGFOOD_BUILD && isSameLooper(Looper.getMainLooper())) {
+        if (FeatureFlags.IS_DOGFOOD_BUILD && isSameLooper(Looper.getMainLooper())) {
             throw new IllegalStateException();
         }
     }

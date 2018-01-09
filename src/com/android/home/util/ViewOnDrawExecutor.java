@@ -16,12 +16,13 @@
 
 package com.android.home.util;
 
+import android.os.Process;
 import android.view.View;
 import android.view.View.OnAttachStateChangeListener;
 import android.view.ViewTreeObserver.OnDrawListener;
 
-import com.android.home.DeferredHandler;
 import com.android.home.Launcher;
+import com.android.home.LauncherModel;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
@@ -33,17 +34,18 @@ public class ViewOnDrawExecutor implements Executor, OnDrawListener, Runnable,
         OnAttachStateChangeListener {
 
     private final ArrayList<Runnable> mTasks = new ArrayList<>();
-    private final DeferredHandler mHandler;
+    private final Executor mExecutor;
 
     private Launcher mLauncher;
     private View mAttachedView;
     private boolean mCompleted;
+    private boolean mIsExecuting;
 
     private boolean mLoadAnimationCompleted;
     private boolean mFirstDrawCompleted;
 
-    public ViewOnDrawExecutor(DeferredHandler handler) {
-        mHandler = handler;
+    public ViewOnDrawExecutor(Executor executor) {
+        mExecutor = executor;
     }
 
     public void attachTo(Launcher launcher) {
@@ -63,6 +65,7 @@ public class ViewOnDrawExecutor implements Executor, OnDrawListener, Runnable,
     @Override
     public void execute(Runnable command) {
         mTasks.add(command);
+        LauncherModel.setWorkerPriority(Process.THREAD_PRIORITY_BACKGROUND);
     }
 
     @Override
@@ -79,6 +82,13 @@ public class ViewOnDrawExecutor implements Executor, OnDrawListener, Runnable,
         mAttachedView.post(this);
     }
 
+    /**
+     * Returns whether the executor is still queuing tasks and hasn't yet executed them.
+     */
+    public boolean canQueue() {
+        return !mIsExecuting && !mCompleted;
+    }
+
     public void onLoadAnimationCompleted() {
         mLoadAnimationCompleted = true;
         if (mAttachedView != null) {
@@ -90,8 +100,9 @@ public class ViewOnDrawExecutor implements Executor, OnDrawListener, Runnable,
     public void run() {
         // Post the pending tasks after both onDraw and onLoadAnimationCompleted have been called.
         if (mLoadAnimationCompleted && mFirstDrawCompleted && !mCompleted) {
+            mIsExecuting = true;
             for (final Runnable r : mTasks) {
-                mHandler.post(r);
+                mExecutor.execute(r);
             }
             markCompleted();
         }
@@ -100,6 +111,7 @@ public class ViewOnDrawExecutor implements Executor, OnDrawListener, Runnable,
     public void markCompleted() {
         mTasks.clear();
         mCompleted = true;
+        mIsExecuting = false;
         if (mAttachedView != null) {
             mAttachedView.getViewTreeObserver().removeOnDrawListener(this);
             mAttachedView.removeOnAttachStateChangeListener(this);
@@ -107,5 +119,6 @@ public class ViewOnDrawExecutor implements Executor, OnDrawListener, Runnable,
         if (mLauncher != null) {
             mLauncher.clearPendingExecutor(this);
         }
+        LauncherModel.setWorkerPriority(Process.THREAD_PRIORITY_DEFAULT);
     }
 }
