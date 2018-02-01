@@ -29,7 +29,6 @@
         launcher:iconSize="55"
         launcher:iconTextSize="12.0"
         launcher:numHotseatIcons="5"
-        launcher:hotseatIconSize="55"
         launcher:defaultLayoutId="@xml/default_workspace_5x5"
         />
 

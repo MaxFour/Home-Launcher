@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.UserHandle;
 
+import com.android.home.LauncherAppState;
 import com.android.home.LauncherModel;
 import com.android.home.compat.LauncherAppsCompat;
 import com.android.home.util.MultiHashMap;
@@ -43,10 +44,10 @@ public class SdCardAvailableReceiver extends BroadcastReceiver {
     private final Context mContext;
     private final MultiHashMap<UserHandle, String> mPackages;
 
-    public SdCardAvailableReceiver(LauncherModel model, Context context,
+    public SdCardAvailableReceiver(LauncherAppState app,
             MultiHashMap<UserHandle, String> packages) {
-        mModel = model;
-        mContext = context;
+        mModel = app.getModel();
+        mContext = app.getContext();
         mPackages = packages;
     }
 

@@ -49,6 +49,9 @@
     <uses-permission android:name="com.android.home.permission.READ_SETTINGS" />
     <uses-permission android:name="com.android.home.permission.WRITE_SETTINGS" />
 
+    <!-- Custom -->
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+
     <application
         android:backupAgent="com.android.home.LauncherBackupAgent"
         android:fullBackupOnly="true"
@@ -71,7 +74,7 @@
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
             android:stateNotNeeded="true"
-            android:windowSoftInputMode="adjustPan|stateHidden"
+            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="nosensor"
             android:configChanges="keyboard|keyboardHidden|navigation"
             android:resizeableActivity="true"
@@ -83,6 +86,7 @@
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.MONKEY"/>
+                <category android:name="android.intent.category.LAUNCHER_APP" />
             </intent-filter>
         </activity>
 
@@ -136,7 +140,8 @@
             android:theme="@android:style/Theme.NoDisplay"
             android:label="* HPROF"
             android:excludeFromRecents="true"
-            android:icon="@drawable/ic_launcher_home"
+            android:icon="@drawable/ic_home"
+            android:roundIcon="@drawable/ic_home_round"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -148,7 +153,8 @@
         <activity
             android:name="com.android.home.testing.ToggleWeightWatcher"
             android:label="Show Mem"
-            android:icon="@drawable/ic_launcher_home">
+            android:icon="@drawable/ic_home">
+            android:roundIcon="@drawable/ic_home_round"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />

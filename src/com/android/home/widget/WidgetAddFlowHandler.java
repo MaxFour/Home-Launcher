@@ -15,10 +15,8 @@
  */
 package com.android.home.widget;
 
-import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -26,7 +24,6 @@ import com.android.home.ItemInfo;
 import com.android.home.Launcher;
 import com.android.home.LauncherAppWidgetInfo;
 import com.android.home.LauncherAppWidgetProviderInfo;
-import com.android.home.compat.AppWidgetManagerCompat;
 import com.android.home.util.PendingRequestArgs;
 
 /**
@@ -56,15 +53,8 @@ public class WidgetAddFlowHandler implements Parcelable {
 
     public void startBindFlow(Launcher launcher, int appWidgetId, ItemInfo info, int requestCode) {
         launcher.setWaitingForResult(PendingRequestArgs.forWidgetInfo(appWidgetId, this, info));
-
-        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, mProviderInfo.provider);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER_PROFILE,
-                mProviderInfo.getProfile());
-        // TODO: we need to make sure that this accounts for the options bundle.
-        // intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_OPTIONS, options);
-        launcher.startActivityForResult(intent, requestCode);
+        launcher.getAppWidgetHost()
+                .startBindFlow(launcher, appWidgetId, mProviderInfo, requestCode);
     }
 
     /**
@@ -85,9 +75,7 @@ public class WidgetAddFlowHandler implements Parcelable {
             return false;
         }
         launcher.setWaitingForResult(PendingRequestArgs.forWidgetInfo(appWidgetId, this, info));
-
-        AppWidgetManagerCompat.getInstance(launcher).startConfigActivity(
-                mProviderInfo, appWidgetId, launcher, launcher.getAppWidgetHost(), requestCode);
+        launcher.getAppWidgetHost().startConfigActivity(launcher, appWidgetId, requestCode);
         return true;
     }
 

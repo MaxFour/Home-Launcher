@@ -27,9 +27,9 @@ import com.android.home.CellLayout;
 import com.android.home.FolderInfo;
 import com.android.home.ItemInfo;
 import com.android.home.Launcher;
-import com.android.home.accessibility.LauncherAccessibilityDelegate.DragType;
 import com.android.home.R;
 import com.android.home.ShortcutInfo;
+import com.android.home.accessibility.LauncherAccessibilityDelegate.DragType;
 import com.android.home.dragndrop.DragLayer;
 
 /**

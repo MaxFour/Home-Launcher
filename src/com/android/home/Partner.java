@@ -65,7 +65,7 @@ public class Partner {
             }
             sSearched = true;
         }
-        return null;
+        return sPartner;
     }
 
     private final String mPackageName;

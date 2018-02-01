@@ -1,24 +1,28 @@
 package com.android.home.features;
 
-
 import android.content.ComponentName;
+import android.content.Context;
 
 import com.android.home.AppFilter;
 
 import java.util.HashSet;
 
 public class HomeAppFilter extends AppFilter {
-    private final HashSet mHide;
+    private final HashSet<ComponentName> mHideList = new HashSet<>();
 
-    public HomeAppFilter() {
-        mHide = new HashSet();
-        mHide.add(ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/.VoiceSearchActivity"));
-        mHide.add(ComponentName.unflattenFromString("com.google.android.apps.wallpaper/.picker.CategoryPickerActivity"));
-        mHide.add(ComponentName.unflattenFromString("com.google.android.launcher/com.google.android.launcher.StubApp"));
-        mHide.add(ComponentName.unflattenFromString("com.android.documentsui/.LauncherActivity"));
+    public HomeAppFilter(Context context) {
+        //Voice Search
+        mHideList.add(ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/.VoiceSearchActivity"));
+
+        //Wallpapers
+        mHideList.add(ComponentName.unflattenFromString("com.google.android.apps.wallpaper/.picker.CategoryPickerActivity"));
+
+        //Google Now Launcher
+        mHideList.add(ComponentName.unflattenFromString("com.google.android.launcher/com.google.android.launcher.StubApp"));
     }
 
-    public boolean shouldShowApp(final  ComponentName componentName) {
-        return !mHide.contains(componentName);
+    @Override
+    public boolean shouldShowApp(ComponentName componentName) {
+        return !mHideList.contains(componentName);
     }
 }

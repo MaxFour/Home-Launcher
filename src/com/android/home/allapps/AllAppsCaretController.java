@@ -22,13 +22,14 @@ import android.view.animation.Interpolator;
 import com.android.home.Launcher;
 import com.android.home.R;
 import com.android.home.pageindicators.CaretDrawable;
+import com.android.home.touch.SwipeDetector;
 
 public class AllAppsCaretController {
     // Determines when the caret should flip. Should be accessed via getThreshold()
     private static final float CARET_THRESHOLD = 0.015f;
     private static final float CARET_THRESHOLD_LAND = 0.5f;
     // The velocity at which the caret will peak (i.e. exhibit a 90 degree bend)
-    private static final float PEAK_VELOCITY = VerticalPullDetector.RELEASE_VELOCITY_PX_MS * .7f;
+    private static final float PEAK_VELOCITY = SwipeDetector.RELEASE_VELOCITY_PX_MS * .7f;
 
     private Launcher mLauncher;
 

@@ -20,10 +20,10 @@ import android.app.Notification;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.NonNull;
 
-import com.android.home.Utilities;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.android.home.Utilities;
 
 /**
  * The key data associated with the notification, used to determine what to include
@@ -44,7 +44,7 @@ public class NotificationKeyData {
 
     public static NotificationKeyData fromNotification(StatusBarNotification sbn) {
         Notification notif = sbn.getNotification();
-        return new NotificationKeyData(sbn.getKey(), Utilities.isAtLeastO() ? notif.getShortcutId() : null, notif.number);
+        return new NotificationKeyData(sbn.getKey(), Utilities.ATLEAST_OREO ? notif.getShortcutId() : null, notif.number);
     }
 
     public static List<String> extractKeysOnly(@NonNull List<NotificationKeyData> notificationKeys) {

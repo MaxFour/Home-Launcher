@@ -22,7 +22,7 @@ import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.android.home.config.ProviderConfig;
+import com.android.home.config.FeatureFlags;
 import com.android.home.folder.Folder;
 import com.android.home.folder.FolderPagedView;
 import com.android.home.util.FocusLogic;
@@ -93,7 +93,7 @@ public class FocusHelper {
             }
 
             if (!(v.getParent() instanceof ShortcutAndWidgetContainer)) {
-                if (ProviderConfig.IS_DOGFOOD_BUILD) {
+                if (FeatureFlags.IS_DOGFOOD_BUILD) {
                     throw new IllegalStateException("Parent of the focused item is not supported.");
                 } else {
                     return false;

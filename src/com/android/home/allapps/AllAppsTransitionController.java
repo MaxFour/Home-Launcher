@@ -6,7 +6,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.support.animation.SpringAnimation;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.MotionEvent;
@@ -22,10 +24,17 @@ import com.android.home.LauncherAnimUtils;
 import com.android.home.R;
 import com.android.home.Utilities;
 import com.android.home.Workspace;
+import com.android.home.anim.SpringAnimationHandler;
+import com.android.home.config.FeatureFlags;
+import com.android.home.graphics.GradientView;
+import com.android.home.touch.SwipeDetector;
 import com.android.home.userevent.nano.LauncherLogProto.Action;
 import com.android.home.userevent.nano.LauncherLogProto.ContainerType;
+import com.android.home.util.SystemUiController;
 import com.android.home.util.Themes;
 import com.android.home.util.TouchController;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Handles AllApps view transition.
@@ -37,17 +46,18 @@ import com.android.home.util.TouchController;
  * If release velocity < THRES1, snap according to either top or bottom depending on whether it's
  * closer to top or closer to the page indicator.
  */
-public class AllAppsTransitionController implements TouchController, VerticalPullDetector.Listener,
-        View.OnLayoutChangeListener {
+public class AllAppsTransitionController implements TouchController, SwipeDetector.Listener,
+         SearchUiManager.OnScrollRangeChangeListener {
 
     private static final String TAG = "AllAppsTrans";
     private static final boolean DBG = false;
 
-    private final Interpolator mAccelInterpolator = new AccelerateInterpolator(2f);
+    private final Interpolator mWorkspaceAccelnterpolator = new AccelerateInterpolator(2f);
+    private final Interpolator mHotseatAccelInterpolator = new AccelerateInterpolator(1.5f);
     private final Interpolator mDecelInterpolator = new DecelerateInterpolator(3f);
     private final Interpolator mFastOutSlowInInterpolator = new FastOutSlowInInterpolator();
-    private final VerticalPullDetector.ScrollInterpolator mScrollInterpolator
-            = new VerticalPullDetector.ScrollInterpolator();
+    private final SwipeDetector.ScrollInterpolator mScrollInterpolator
+            = new SwipeDetector.ScrollInterpolator();
 
     private static final float PARALLAX_COEFFICIENT = .125f;
     private static final int SINGLE_FRAME_MS = 16;
@@ -63,8 +73,9 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
     private float mStatusBarHeight;
 
     private final Launcher mLauncher;
-    private final VerticalPullDetector mDetector;
+    private final SwipeDetector mDetector;
     private final ArgbEvaluator mEvaluator;
+    private final boolean mIsDarkTheme;
 
     // Animation in this class is controlled by a single variable {@link mProgress}.
     // Visually, it represents top y coordinate of the all apps container if multiplied with
@@ -87,26 +98,42 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
 
     private AnimatorSet mCurrentAnimation;
     private boolean mNoIntercept;
+    private boolean mTouchEventStartedOnHotseat;
 
     // Used in discovery bounce animation to provide the transition without workspace changing.
     private boolean mIsTranslateWithoutWorkspace = false;
-    private AnimatorSet mDiscoBounceAnimation;
+    private Animator mDiscoBounceAnimation;
+    private GradientView mGradientView;
+
+    private SpringAnimation mSearchSpring;
+    private SpringAnimationHandler mSpringAnimationHandler;
+
+    private final static float NOTIFICATION_OPEN_VELOCITY = 2.25f;
+    private final static float NOTIFICATION_CLOSE_VELOCITY = -0.35f;
+    enum NotificationState {
+        Locked,
+        Free,
+        Opened,
+        Closed
+    }
+    private NotificationState mNotificationState;
 
     public AllAppsTransitionController(Launcher l) {
         mLauncher = l;
-        mDetector = new VerticalPullDetector(l);
-        mDetector.setListener(this);
+        mDetector = new SwipeDetector(l, this, SwipeDetector.VERTICAL);
         mShiftRange = DEFAULT_SHIFT_RANGE;
         mProgress = 1f;
 
         mEvaluator = new ArgbEvaluator();
         mAllAppsBackgroundColor = Themes.getAttrColor(l, android.R.attr.colorPrimary);
+        mIsDarkTheme = Themes.getAttrBoolean(mLauncher, R.attr.isMainColorDark);
     }
 
     @Override
     public boolean onControllerInterceptTouchEvent(MotionEvent ev) {
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             mNoIntercept = false;
+            mTouchEventStartedOnHotseat = mLauncher.getDragLayer().isEventOverHotseat(ev);
             if (!mLauncher.isAllAppsVisible() && mLauncher.getWorkspace().workspaceInModalState()) {
                 mNoIntercept = true;
             } else if (mLauncher.isAllAppsVisible() &&
@@ -122,17 +149,17 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
 
                 if (mDetector.isIdleState()) {
                     if (mLauncher.isAllAppsVisible()) {
-                        directionsToDetectScroll |= VerticalPullDetector.DIRECTION_DOWN;
+                        directionsToDetectScroll |= SwipeDetector.DIRECTION_NEGATIVE;
                     } else {
-                        directionsToDetectScroll |= VerticalPullDetector.DIRECTION_UP;
+                        directionsToDetectScroll |= SwipeDetector.DIRECTION_BOTH;
                     }
                 } else {
                     if (isInDisallowRecatchBottomZone()) {
-                        directionsToDetectScroll |= VerticalPullDetector.DIRECTION_UP;
+                        directionsToDetectScroll |= SwipeDetector.DIRECTION_POSITIVE;
                     } else if (isInDisallowRecatchTopZone()) {
-                        directionsToDetectScroll |= VerticalPullDetector.DIRECTION_DOWN;
+                        directionsToDetectScroll |= SwipeDetector.DIRECTION_NEGATIVE;
                     } else {
-                        directionsToDetectScroll |= VerticalPullDetector.DIRECTION_BOTH;
+                        directionsToDetectScroll |= SwipeDetector.DIRECTION_BOTH;
                         ignoreSlopWhenSettling = true;
                     }
                 }
@@ -153,6 +180,9 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
 
     @Override
     public boolean onControllerTouchEvent(MotionEvent ev) {
+        if (hasSpringAnimationHandler()) {
+            mSpringAnimationHandler.addMovement(ev);
+        }
         return mDetector.onTouchEvent(ev);
     }
 
@@ -171,12 +201,42 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
         mCurrentAnimation = LauncherAnimUtils.createAnimatorSet();
         mShiftStart = mAppsView.getTranslationY();
         preparePull(start);
+        if (hasSpringAnimationHandler()) {
+            mSpringAnimationHandler.skipToEnd();
+        }
+        mNotificationState = NotificationState.Free;
     }
 
     @Override
     public boolean onDrag(float displacement, float velocity) {
         if (mAppsView == null) {
             return false;   // early termination.
+        }
+
+        //Locked means do not use any notification code
+        if (mNotificationState != NotificationState.Locked) {
+            if (mProgress < 1f) {
+                //Apps list is being opened, disable notification code
+                mNotificationState = NotificationState.Locked;
+            } else {
+                //Disable code when access to the hidden APIs returns an error
+                if (velocity > NOTIFICATION_OPEN_VELOCITY &&
+                        (mNotificationState == NotificationState.Free || mNotificationState == NotificationState.Closed)) {
+                    mNotificationState = openNotifications() ?
+                            NotificationState.Opened :
+                            NotificationState.Locked;
+                } else if (velocity < NOTIFICATION_CLOSE_VELOCITY &&
+                        mNotificationState == NotificationState.Opened) {
+                    mNotificationState = closeNotifications() ?
+                            NotificationState.Closed :
+                            NotificationState.Locked;
+                }
+
+                //Don't open all apps when notification shade is being used
+                if (mNotificationState == NotificationState.Opened || mNotificationState == NotificationState.Closed) {
+                    return true;
+                }
+            }
         }
 
         mContainerVelocity = velocity;
@@ -187,13 +247,40 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
         return true;
     }
 
+    @SuppressLint({"WrongConstant", "PrivateApi"})
+    private boolean openNotifications() {
+        try {
+            Class.forName("android.app.StatusBarManager")
+                    .getMethod("expandNotificationsPanel")
+                    .invoke(mLauncher.getSystemService("statusbar"));
+            return true;
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            return false;
+        }
+    }
+
+    @SuppressLint({"WrongConstant", "PrivateApi"})
+    private boolean closeNotifications() {
+        try {
+            Class.forName("android.app.StatusBarManager")
+                    .getMethod("collapsePanels")
+                    .invoke(mLauncher.getSystemService("statusbar"));
+            return true;
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            return false;
+        }
+    }
+
     @Override
     public void onDragEnd(float velocity, boolean fling) {
         if (mAppsView == null) {
             return; // early termination.
         }
 
-        if (fling) {
+        final int containerType = mTouchEventStartedOnHotseat
+                ? ContainerType.HOTSEAT : ContainerType.WORKSPACE;
+
+        if (fling && mNotificationState != NotificationState.Opened && mNotificationState != NotificationState.Closed) {
             if (velocity < 0) {
                 calculateDuration(velocity, mAppsView.getTranslationY());
 
@@ -201,11 +288,14 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
                     mLauncher.getUserEventDispatcher().logActionOnContainer(
                             Action.Touch.FLING,
                             Action.Direction.UP,
-                            ContainerType.HOTSEAT);
+                            containerType);
                 }
-                mLauncher.showAppsView(true /* animated */,
-                        false /* updatePredictedApps */,
-                        false /* focusSearchBar */);
+                mLauncher.showAppsView(true /* animated */, false /* updatePredictedApps */);
+                if (hasSpringAnimationHandler()) {
+                    mSpringAnimationHandler.add(mSearchSpring, true /* setDefaultValues */);
+                    // The icons are moving upwards, so we go to 0 from 1. (y-axis 1 is below 0.)
+                    mSpringAnimationHandler.animateToFinalPosition(0 /* pos */, 1 /* startValue */);
+                }
             } else {
                 calculateDuration(velocity, Math.abs(mShiftRange - mAppsView.getTranslationY()));
                 mLauncher.showWorkspace(true);
@@ -221,11 +311,9 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
                     mLauncher.getUserEventDispatcher().logActionOnContainer(
                             Action.Touch.SWIPE,
                             Action.Direction.UP,
-                            ContainerType.HOTSEAT);
+                            containerType);
                 }
-                mLauncher.showAppsView(true, /* animated */
-                        false /* updatePredictedApps */,
-                        false /* focusSearchBar */);
+                mLauncher.showAppsView(true, /* animated */ false /* updatePredictedApps */);
             }
         }
     }
@@ -247,20 +335,40 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
             if (!mLauncher.isAllAppsVisible()) {
                 mLauncher.tryAndUpdatePredictedApps();
                 mAppsView.setVisibility(View.VISIBLE);
-                mAppsView.setRevealDrawableColor(mHotseatBackgroundColor);
+                if (!FeatureFlags.HOME_GRADIENT_ALL_APPS) {
+                    mAppsView.setRevealDrawableColor(mHotseatBackgroundColor);
+                }
             }
         }
     }
 
     private void updateLightStatusBar(float shift) {
         // Do not modify status bar on landscape as all apps is not full bleed.
-        if (mLauncher.getDeviceProfile().isVerticalBarLayout()) {
+        if (!FeatureFlags.HOME_GRADIENT_ALL_APPS
+                && mLauncher.getDeviceProfile().isVerticalBarLayout()) {
             return;
         }
-        // Use a light status bar (dark icons) if all apps is behind at least half of the status
-        // bar. If the status bar is already light due to wallpaper extraction, keep it that way.
-        boolean forceLight = shift <= mStatusBarHeight / 2;
-        mLauncher.activateLightSystemBars(forceLight, true /* statusBar */, true /* navBar */);
+
+        // Use a light system UI (dark icons) if all apps is behind at least half of the status bar.
+        boolean forceChange = FeatureFlags.HOME_GRADIENT_ALL_APPS ?
+                shift <= mShiftRange / 4 :
+                shift <= mStatusBarHeight / 2;
+        if (forceChange) {
+            mLauncher.getSystemUiController().updateUiState(
+                    SystemUiController.UI_STATE_ALL_APPS, !mIsDarkTheme);
+        } else {
+            mLauncher.getSystemUiController().updateUiState(
+                    SystemUiController.UI_STATE_ALL_APPS, 0);
+        }
+    }
+
+    private void updateAllAppsBg(float progress) {
+        // gradient
+        if (mGradientView == null) {
+            mGradientView = (GradientView) mLauncher.findViewById(R.id.gradient_bg);
+            mGradientView.setVisibility(View.VISIBLE);
+        }
+        mGradientView.setProgress(progress);
     }
 
     /**
@@ -273,31 +381,37 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
 
         float workspaceHotseatAlpha = Utilities.boundToRange(progress, 0f, 1f);
         float alpha = 1 - workspaceHotseatAlpha;
-        float interpolation = mAccelInterpolator.getInterpolation(workspaceHotseatAlpha);
+        float workspaceAlpha = mWorkspaceAccelnterpolator.getInterpolation(workspaceHotseatAlpha);
+        float hotseatAlpha = mHotseatAccelInterpolator.getInterpolation(workspaceHotseatAlpha);
 
         int color = (Integer) mEvaluator.evaluate(mDecelInterpolator.getInterpolation(alpha),
                 mHotseatBackgroundColor, mAllAppsBackgroundColor);
         int bgAlpha = Color.alpha((int) mEvaluator.evaluate(alpha,
                 mHotseatBackgroundColor, mAllAppsBackgroundColor));
 
-        mAppsView.setRevealDrawableColor(ColorUtils.setAlphaComponent(color, bgAlpha));
+        if (FeatureFlags.HOME_GRADIENT_ALL_APPS) {
+            updateAllAppsBg(alpha);
+        } else {
+            mAppsView.setRevealDrawableColor(ColorUtils.setAlphaComponent(color, bgAlpha));
+        }
+
         mAppsView.getContentView().setAlpha(alpha);
         mAppsView.setTranslationY(shiftCurrent);
 
         if (!mLauncher.getDeviceProfile().isVerticalBarLayout()) {
             mWorkspace.setHotseatTranslationAndAlpha(Workspace.Direction.Y, -mShiftRange + shiftCurrent,
-                    interpolation);
+                    hotseatAlpha);
         } else {
             mWorkspace.setHotseatTranslationAndAlpha(Workspace.Direction.Y,
                     PARALLAX_COEFFICIENT * (-mShiftRange + shiftCurrent),
-                    interpolation);
+                    hotseatAlpha);
         }
 
         if (mIsTranslateWithoutWorkspace) {
             return;
         }
         mWorkspace.setWorkspaceYTranslationAndAlpha(
-                PARALLAX_COEFFICIENT * (-mShiftRange + shiftCurrent), interpolation);
+                PARALLAX_COEFFICIENT * (-mShiftRange + shiftCurrent), workspaceAlpha);
 
         if (!mDetector.isDraggingState()) {
             mContainerVelocity = mDetector.computeVelocity(shiftCurrent - shiftPrevious,
@@ -313,7 +427,7 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
     }
 
     private void calculateDuration(float velocity, float disp) {
-        mAnimationDuration = mDetector.calculateDuration(velocity, disp / mShiftRange);
+        mAnimationDuration = SwipeDetector.calculateDuration(velocity, disp / mShiftRange);
     }
 
     public boolean animateToAllApps(AnimatorSet animationOut, long duration) {
@@ -371,8 +485,8 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
         cancelDiscoveryAnimation();
 
         // assumption is that this variable is always null
-        mDiscoBounceAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(mLauncher,
-                R.anim.discovery_bounce);
+        mDiscoBounceAnimation = AnimatorInflater.loadAnimator(mLauncher,
+                R.animator.discovery_bounce);
         mDiscoBounceAnimation.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -451,6 +565,10 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
 
     public void finishPullUp() {
         mHotseat.setVisibility(View.INVISIBLE);
+        if (hasSpringAnimationHandler()) {
+            mSpringAnimationHandler.remove(mSearchSpring);
+            mSpringAnimationHandler.reset();
+        }
         setProgress(0f);
     }
 
@@ -459,6 +577,9 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
         mHotseat.setBackgroundTransparent(false /* transparent */);
         mHotseat.setVisibility(View.VISIBLE);
         mAppsView.reset();
+        if (hasSpringAnimationHandler()) {
+            mSpringAnimationHandler.reset();
+        }
         setProgress(1f);
     }
 
@@ -486,21 +607,21 @@ public class AllAppsTransitionController implements TouchController, VerticalPul
         mAppsView = appsView;
         mHotseat = hotseat;
         mWorkspace = workspace;
-        mHotseat.addOnLayoutChangeListener(this);
         mHotseat.bringToFront();
         mCaretController = new AllAppsCaretController(
                 mWorkspace.getPageIndicator().getCaretDrawable(), mLauncher);
+        mAppsView.getSearchUiManager().addOnScrollRangeChangeListener(this);
+        mSpringAnimationHandler = mAppsView.getSpringAnimationHandler();
+        mSearchSpring = mAppsView.getSearchUiManager().getSpringForFling();
+    }
+
+    private boolean hasSpringAnimationHandler() {
+        return FeatureFlags.HOME_PHYSICS && mSpringAnimationHandler != null;
     }
 
     @Override
-    public void onLayoutChange(View v, int left, int top, int right, int bottom,
-            int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        if (!mLauncher.getDeviceProfile().isVerticalBarLayout()) {
-            mShiftRange = top;
-        } else {
-            mShiftRange = bottom;
-        }
+    public void onScrollRangeChanged(int scrollRange) {
+        mShiftRange = scrollRange;
         setProgress(mProgress);
     }
-
 }

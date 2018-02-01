@@ -18,14 +18,14 @@ package com.android.home;
 
 import android.os.Looper;
 
-import com.android.home.util.LooperExecuter;
+import com.android.home.util.LooperExecutor;
 
 /**
  * An executor service that executes its tasks on the main thread.
  *
  * Shutting down this executor is not supported.
  */
-public class MainThreadExecutor extends LooperExecuter {
+public class MainThreadExecutor extends LooperExecutor {
 
     public MainThreadExecutor() {
         super(Looper.getMainLooper());

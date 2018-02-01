@@ -4,138 +4,117 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.content.pm.LauncherActivityInfo;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
+import android.os.Process;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.UserHandle;
-import android.util.Log;
 
 import com.android.home.IconProvider;
 import com.android.home.LauncherAppState;
 import com.android.home.LauncherModel;
+import com.android.home.Utilities;
 import com.android.home.compat.UserManagerCompat;
 import com.android.home.shortcuts.DeepShortcutManager;
-
-import org.xmlpull.v1.XmlPullParser;
+import com.android.home.shortcuts.ShortcutInfoCompat;
+import com.android.home.features.DynamicClock;
 
 import java.util.Calendar;
 import java.util.List;
 
-public class DynamicIconProvider extends IconProvider
-{
-    private BroadcastReceiver mBroadcastReceiver;
-    protected PackageManager mPackageManager;
+public class DynamicIconProvider extends IconProvider {
+    public static final String GOOGLE_CALENDAR = "com.google.android.calendar";
+    private final BroadcastReceiver mDateChangeReceiver;
+    private final Context mContext;
+    private final PackageManager mPackageManager;
+    private int mDateOfMonth;
 
     public DynamicIconProvider(Context context) {
-        mBroadcastReceiver = new DynamicIconProviderReceiver(this);
-        IntentFilter intentFilter = new IntentFilter("android.intent.action.DATE_CHANGED");
-        intentFilter.addAction("android.intent.action.TIME_SET");
-        intentFilter.addAction("android.intent.action.TIMEZONE_CHANGED");
-        context.registerReceiver(mBroadcastReceiver, intentFilter, null, new Handler(LauncherModel.getWorkerLooper()));
-        mPackageManager = context.getPackageManager();
+        mContext = context;
+        mDateChangeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (!Utilities.ATLEAST_NOUGAT) {
+                    int dateOfMonth = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+                    if (dateOfMonth == mDateOfMonth) {
+                        return;
+                    }
+                    mDateOfMonth = dateOfMonth;
+                }
+                for (UserHandle user : UserManagerCompat.getInstance(context).getUserProfiles()) {
+                    LauncherModel model = LauncherAppState.getInstance(context).getModel();
+                    model.onPackageChanged(GOOGLE_CALENDAR, user);
+                    List<ShortcutInfoCompat> shortcuts = DeepShortcutManager.getInstance(context).queryForPinnedShortcuts(GOOGLE_CALENDAR, user);
+                    if (!shortcuts.isEmpty()) {
+                        model.updatePinnedShortcuts(GOOGLE_CALENDAR, shortcuts, user);
+                    }
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_DATE_CHANGED);
+        intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+        intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+        if (!Utilities.ATLEAST_NOUGAT) {
+            intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        }
+        mContext.registerReceiver(mDateChangeReceiver, intentFilter, null, new Handler(LauncherModel.getWorkerLooper()));
+        mPackageManager = mContext.getPackageManager();
     }
 
-    private int dayOfMonth() {
+    private int getDayOfMonth() {
         return Calendar.getInstance().get(Calendar.DAY_OF_MONTH) - 1;
     }
 
-    private int getCorrectShape(Bundle bundle, Resources resources) {
+    private int getDayResId(Bundle bundle, Resources resources) {
         if (bundle != null) {
-            int roundIcons = bundle.getInt("com.google.android.calendar.dynamic_icons_nexus_round", 0);
-            if (roundIcons != 0) {
+            int dateArrayId = bundle.getInt(GOOGLE_CALENDAR + ".dynamic_icons_nexus_round", 0);
+            if (dateArrayId != 0) {
                 try {
-                    TypedArray obtainTypedArray = resources.obtainTypedArray(roundIcons);
-                    int resourceId = obtainTypedArray.getResourceId(dayOfMonth(), 0);
-                    obtainTypedArray.recycle();
-                    return resourceId;
-                }
-                catch (Resources.NotFoundException ex) {
+                    TypedArray dateIds = resources.obtainTypedArray(dateArrayId);
+                    int dateId = dateIds.getResourceId(getDayOfMonth(), 0);
+                    dateIds.recycle();
+                    return dateId;
+                } catch (Resources.NotFoundException ex) {
                 }
             }
         }
-
         return 0;
     }
 
-    private boolean isCalendar(final String s) {
-        return "com.google.android.calendar".equals(s);
-    }
-
-    private Drawable getRoundIcon(String packageName, int iconDpi) {
-        try {
-            Resources resourcesForApplication = mPackageManager.getResourcesForApplication(packageName);
-            AssetManager assets = resourcesForApplication.getAssets();
-            XmlResourceParser parseXml = assets.openXmlResourceParser("AndroidManifest.xml");
-            int eventType;
-            while ((eventType = parseXml.nextToken()) != XmlPullParser.END_DOCUMENT)
-                if (eventType == XmlPullParser.START_TAG && parseXml.getName().equals("application"))
-                    for (int i = 0; i < parseXml.getAttributeCount(); i++)
-                        if (parseXml.getAttributeName(i).equals("roundIcon"))
-                            return resourcesForApplication.getDrawableForDensity(Integer.parseInt(parseXml.getAttributeValue(i).substring(1)), iconDpi);
-            parseXml.close();
-        }
-        catch (Exception ex) {
-            Log.w("getRoundIcon", ex);
-        }
-        return null;
+    private boolean isCalendar(String s) {
+        return GOOGLE_CALENDAR.equals(s);
     }
 
     @Override
-    public Drawable getIcon(final LauncherActivityInfo launcherActivityInfoCompat, int iconDpi) {
-        String packageName = launcherActivityInfoCompat.getApplicationInfo().packageName;
-        Drawable drawable = getRoundIcon(packageName, iconDpi);
-
+    public Drawable getIcon(LauncherActivityInfo launcherActivityInfo, int iconDpi, boolean flattenDrawable) {
+        Drawable drawable = null;
+        String packageName = launcherActivityInfo.getApplicationInfo().packageName;
         if (isCalendar(packageName)) {
             try {
-                ActivityInfo activityInfo = mPackageManager.getActivityInfo(launcherActivityInfoCompat.getComponentName(), PackageManager.GET_META_DATA | PackageManager.MATCH_UNINSTALLED_PACKAGES);
-                Bundle metaData = activityInfo.metaData;
+                Bundle metaData = mPackageManager.getActivityInfo(launcherActivityInfo.getComponentName(), PackageManager.GET_META_DATA | PackageManager.GET_UNINSTALLED_PACKAGES).metaData;
                 Resources resourcesForApplication = mPackageManager.getResourcesForApplication(packageName);
-                int shape = getCorrectShape(metaData, resourcesForApplication);
-                if (shape != 0) {
-                    drawable = resourcesForApplication.getDrawableForDensity(shape, iconDpi);
+                int dayResId = getDayResId(metaData, resourcesForApplication);
+                if (dayResId != 0) {
+                    drawable = resourcesForApplication.getDrawableForDensity(dayResId, iconDpi);
                 }
+            } catch (NameNotFoundException e) {
             }
-            catch (PackageManager.NameNotFoundException ex3) {}
+        } else if (!flattenDrawable &&
+                DynamicClock.DESK_CLOCK.equals(launcherActivityInfo.getComponentName()) &&
+                Process.myUserHandle().equals(launcherActivityInfo.getUser())) {
+            drawable = DynamicClock.getClock(mContext, iconDpi);
         }
-
-        if (drawable == null) {
-            drawable = super.getIcon(launcherActivityInfoCompat, iconDpi);
-        }
-
-        return drawable;
+        return drawable == null ? super.getIcon(launcherActivityInfo, iconDpi, flattenDrawable) : drawable;
     }
 
-    public String getIconSystemState(String s) {
-        if (isCalendar(s)) {
-            return mSystemState + " " + dayOfMonth();
-        }
-        return mSystemState;
-    }
-
-    class DynamicIconProviderReceiver extends BroadcastReceiver
-    {
-        DynamicIconProvider mDynamicIconProvider;
-
-        DynamicIconProviderReceiver(final DynamicIconProvider dynamicIconProvider) {
-            mDynamicIconProvider = dynamicIconProvider;
-        }
-
-        public void onReceive(final Context context, final Intent intent) {
-            for (UserHandle userHandleCompat : UserManagerCompat.getInstance(context).getUserProfiles()) {
-                LauncherAppState instance = LauncherAppState.getInstance(context);
-                instance.getModel().onPackageChanged("com.google.android.calendar", userHandleCompat);
-                List queryForPinnedShortcuts = DeepShortcutManager.getInstance(context).queryForPinnedShortcuts("com.google.android.calendar", userHandleCompat);
-                if (!queryForPinnedShortcuts.isEmpty()) {
-                    instance.getModel().updatePinnedShortcuts("com.google.android.calendar", queryForPinnedShortcuts, userHandleCompat);
-                }
-            }
-        }
+    @Override
+    public String getIconSystemState(final String s) {
+        return isCalendar(s) ? mSystemState + " " + getDayOfMonth() : mSystemState;
     }
 }

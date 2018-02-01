@@ -15,42 +15,46 @@
  */
 package com.android.home.ui.widget;
 
+import android.support.test.filters.LargeTest;
+import android.support.test.runner.AndroidJUnit4;
 import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.UiObject2;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 
 import com.android.home.ItemInfo;
-import com.android.home.Launcher;
 import com.android.home.LauncherAppWidgetInfo;
 import com.android.home.LauncherAppWidgetProviderInfo;
 import com.android.home.Workspace.ItemOperator;
-import com.android.home.ui.LauncherInstrumentationTestCase;
+import com.android.home.ui.AbstractLauncherUiTest;
 import com.android.home.util.Condition;
 import com.android.home.util.Wait;
+import com.android.home.util.rule.LauncherActivityRule;
+import com.android.home.util.rule.ShellCommandRule;
 import com.android.home.widget.WidgetCell;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test to add widget from widget tray
  */
 @LargeTest
-public class AddWidgetTest extends LauncherInstrumentationTestCase {
+@RunWith(AndroidJUnit4.class)
+public class AddWidgetTest extends AbstractLauncherUiTest {
 
-    private LauncherAppWidgetProviderInfo widgetInfo;
+    @Rule public LauncherActivityRule mActivityMonitor = new LauncherActivityRule();
+    @Rule public ShellCommandRule mGrantWidgetRule = ShellCommandRule.grandWidgetBind();
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        grantWidgetPermission();
-
-        widgetInfo = findWidgetProvider(false /* hasConfigureScreen */);
-    }
-
+    @Test
     public void testDragIcon_portrait() throws Throwable {
         lockRotation(true);
         performTest();
     }
 
+    @Test
     public void testDragIcon_landscape() throws Throwable {
         lockRotation(false);
         performTest();
@@ -58,7 +62,10 @@ public class AddWidgetTest extends LauncherInstrumentationTestCase {
 
     private void performTest() throws Throwable {
         clearHomescreen();
-        Launcher launcher = startLauncher();
+        mActivityMonitor.startLauncher();
+
+        final LauncherAppWidgetProviderInfo widgetInfo =
+                findWidgetProvider(false /* hasConfigureScreen */);
 
         // Open widget tray and wait for load complete.
         final UiObject2 widgetContainer = openWidgetsTray();
@@ -69,12 +76,12 @@ public class AddWidgetTest extends LauncherInstrumentationTestCase {
                 .hasDescendant(By.text(widgetInfo.getLabel(mTargetContext.getPackageManager()))));
         dragToWorkspace(widget, false);
 
-        assertNotNull(launcher.getWorkspace().getFirstMatch(new ItemOperator() {
+        assertTrue(mActivityMonitor.itemExists(new ItemOperator() {
             @Override
             public boolean evaluate(ItemInfo info, View view) {
                 return info instanceof LauncherAppWidgetInfo &&
                         ((LauncherAppWidgetInfo) info).providerName.equals(widgetInfo.provider);
             }
-        }));
+        }).call());
     }
 }
