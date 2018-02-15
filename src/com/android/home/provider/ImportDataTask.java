@@ -379,6 +379,7 @@ public class ImportDataTask {
     private static int getMyHotseatLayoutId(Context context) {
             return R.xml.dw_phone_hotseat;
     }
+
     /**
      * Extension of {@link DefaultLayoutParser} which only allows icons and shortcuts.
      */
