@@ -190,7 +190,6 @@ public class WallpaperManagerCompatVL extends WallpaperManagerCompat {
         // to avoid bright images with some dark spots.
         private static final float DARK_PIXEL_LUMINANCE = 0.45f;
         private static final float MAX_DARK_AREA = 0.05f;
-
         private HandlerThread mWorkerThread;
         private Handler mWorkerHandler;
 
@@ -287,7 +286,7 @@ public class WallpaperManagerCompatVL extends WallpaperManagerCompat {
                 bitmap.recycle();
 
                 StringBuilder builder = new StringBuilder(value);
-                List<Pair<Integer,Integer>> colorsToOccurrences = new ArrayList<>();
+                List<Pair<Integer, Integer>> colorsToOccurrences = new ArrayList<>();
                 for (Palette.Swatch swatch : palette.getSwatches()) {
                     colorsToOccurrences.add(new Pair(swatch.getRgb(), swatch.getPopulation()));
                 }
@@ -299,8 +298,8 @@ public class WallpaperManagerCompatVL extends WallpaperManagerCompat {
                     }
                 });
 
-                builder.append(',').append(hints);
-                for (int i=0; i < Math.min(3, colorsToOccurrences.size()); i++) {
+                for (int i = 0; i < Math.min(3, colorsToOccurrences.size()); i++) {
+                    builder.append(',').append(hints);
                     builder.append(',').append(colorsToOccurrences.get(i).first);
                 }
 
@@ -311,48 +310,48 @@ public class WallpaperManagerCompatVL extends WallpaperManagerCompat {
             sendBroadcast(new Intent(ACTION_EXTRACTION_COMPLETE)
                     .setPackage(getPackageName())
                     .putExtra(KEY_COLORS, value));
-
         }
 
-        /**
-         * Checks if image is bright and clean enough to support light text.
-         *
-         * @param source What to read.
-         * @return Whether image supports dark text or not.
-         */
-        private static int calculateDarkHints(Bitmap source) {
-            if (source == null) {
-                return 0;
-            }
-            int[] pixels = new int[source.getWidth() * source.getHeight()];
-            double totalLuminance = 0;
-            final int maxDarkPixels = (int) (pixels.length * MAX_DARK_AREA);
-            int darkPixels = 0;
-            source.getPixels(pixels, 0 /* offset */, source.getWidth(), 0 /* x */, 0 /* y */,
-                    source.getWidth(), source.getHeight());
-            // This bitmap was already resized to fit the maximum allowed area.
-            // Let's just loop through the pixels, no sweat!
-            float[] tmpHsl = new float[3];
-            for (int i = 0; i < pixels.length; i++) {
-                ColorUtils.colorToHSL(pixels[i], tmpHsl);
-                final float luminance = tmpHsl[2];
-                final int alpha = Color.alpha(pixels[i]);
-                // Make sure we don't have a dark pixel mass that will
-                // make text illegible.
-                if (luminance < DARK_PIXEL_LUMINANCE && alpha != 0) {
-                    darkPixels++;
+
+            /**
+             * Checks if image is bright and clean enough to support light text.
+             *
+             * @param source What to read.
+             * @return Whether image supports dark text or not.
+             */
+            private static int calculateDarkHints(Bitmap source) {
+                if (source == null) {
+                    return 0;
                 }
-                totalLuminance += luminance;
+                int[] pixels = new int[source.getWidth() * source.getHeight()];
+                double totalLuminance = 0;
+                final int maxDarkPixels = (int) (pixels.length * MAX_DARK_AREA);
+                int darkPixels = 0;
+                source.getPixels(pixels, 0 /* offset */, source.getWidth(), 0 /* x */, 0 /* y */,
+                        source.getWidth(), source.getHeight());
+                // This bitmap was already resized to fit the maximum allowed area.
+                // Let's just loop through the pixels, no sweat!
+                float[] tmpHsl = new float[3];
+                for (int i = 0; i < pixels.length; i++) {
+                    ColorUtils.colorToHSL(pixels[i], tmpHsl);
+                    final float luminance = tmpHsl[2];
+                    final int alpha = Color.alpha(pixels[i]);
+                    // Make sure we don't have a dark pixel mass that will
+                    // make text illegible.
+                    if (luminance < DARK_PIXEL_LUMINANCE && alpha != 0) {
+                        darkPixels++;
+                    }
+                    totalLuminance += luminance;
+                }
+                int hints = 0;
+                double meanLuminance = totalLuminance / pixels.length;
+                if (meanLuminance > BRIGHT_IMAGE_MEAN_LUMINANCE && darkPixels < maxDarkPixels) {
+                    hints |= WallpaperColorsCompat.HINT_SUPPORTS_DARK_TEXT;
+                }
+                if (meanLuminance < DARK_THEME_MEAN_LUMINANCE) {
+                    hints |= WallpaperColorsCompat.HINT_SUPPORTS_DARK_THEME;
+                }
+                return hints;
             }
-            int hints = 0;
-            double meanLuminance = totalLuminance / pixels.length;
-            if (meanLuminance > BRIGHT_IMAGE_MEAN_LUMINANCE && darkPixels < maxDarkPixels) {
-                hints |= WallpaperColorsCompat.HINT_SUPPORTS_DARK_TEXT;
-            }
-            if (meanLuminance < DARK_THEME_MEAN_LUMINANCE) {
-                hints |= WallpaperColorsCompat.HINT_SUPPORTS_DARK_THEME;
-            }
-            return hints;
         }
     }
-}

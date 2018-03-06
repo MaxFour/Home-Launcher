@@ -99,6 +99,7 @@ public class SettingsActivity extends Activity {
                         findPreference(SessionCommitReceiver.ADD_ICON_PREFERENCE_KEY));
             }
             if (!getResources().getBoolean(R.bool.notification_badging_enabled)) {
+            } else if (!getResources().getBoolean(R.bool.notification_badging_enabled)) {
                 getPreferenceScreen().removePreference(iconBadgingPref);
             } else {
                 // Listen to system notification badge settings while this UI is active.

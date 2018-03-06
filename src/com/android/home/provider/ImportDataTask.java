@@ -377,7 +377,7 @@ public class ImportDataTask {
     }
 
     private static int getMyHotseatLayoutId(Context context) {
-            return R.xml.dw_phone_hotseat;
+        return R.xml.dw_phone_hotseat;
     }
 
     /**
