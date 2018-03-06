@@ -40,10 +40,17 @@
     <SwitchPreference
         android:key="pref_allowRotation"
         android:title="@string/allow_rotation_title"
-        android:defaultValue="true"
+        android:defaultValue="@bool/allow_rotation"
         android:persistent="true"
         />
 
+    <SwitchPreference
+        android:key="pref_dark_theme"
+        android:title="@string/enable_dark_theme_label"
+        android:summary="@string/enable_dark_theme_description"
+        android:defaultValue="@bool/dark_theme"
+        android:persistent="true"
+        />
     <ListPreference
         android:key="pref_override_icon_shape"
         android:title="@string/icon_shape_override_label"

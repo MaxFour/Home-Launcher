@@ -127,6 +127,8 @@ public final class Utilities {
 
     public static final String ALLOW_ROTATION_PREFERENCE_KEY = "pref_allowRotation";
 
+    public static final String ENABLE_DARK_THEME_KEY = "pref_dark_theme";
+
     public static boolean isPropertyEnabled(String propertyName) {
         return Log.isLoggable(propertyName, Log.VERBOSE);
     }
@@ -134,6 +136,11 @@ public final class Utilities {
     public static boolean isAllowRotationPrefEnabled(Context context) {
         return getPrefs(context).getBoolean(ALLOW_ROTATION_PREFERENCE_KEY,
                 getAllowRotationDefaultValue(context));
+    }
+
+    public static boolean isDarkThemeEnabled(Context context) {
+        return getPrefs(context).getBoolean(ENABLE_DARK_THEME_KEY,
+                false);
     }
 
     public static boolean getAllowRotationDefaultValue(Context context) {
