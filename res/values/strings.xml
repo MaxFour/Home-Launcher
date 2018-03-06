@@ -316,4 +316,8 @@
     <!-- Accessibility confirmation for notification being dismissed. -->
     <string name="notification_dismissed">Notification dismissed</string>
 
+    <!-- Dark theme & dark theme description -->
+    <string name="enable_dark_theme_label">Enable dark theme</string>
+    <string name="enable_dark_theme_description">Enable dark theme regardless of the color of the wallpaper</string>
+
 </resources>
