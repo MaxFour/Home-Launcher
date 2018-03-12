@@ -144,4 +144,7 @@
     <declare-styleable name="RecyclerViewFastScroller">
         <attr name="canThumbDetach" format="boolean" />
     </declare-styleable>
+
+    <attr name="bottomSheetNavBarColor" format="color" />
+    
 </resources>
