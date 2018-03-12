@@ -5,8 +5,8 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.0'
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.3'
     }
 }
 
@@ -20,8 +20,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 1022
-        versionName "1.2.2" //8.1.0-r14
+        versionCode 1023
+        versionName "1.2.3" //8.1.0-r18
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -44,7 +44,7 @@ android {
             testApplicationId 'com.android.home.tests'
         }
 
-        hgo {
+        l3go {
             applicationId 'com.android.home'
             testApplicationId 'com.android.home.tests'
         }
@@ -75,7 +75,7 @@ android {
             manifest.srcFile "tests/AndroidManifest.xml"
         }
 
-        hgo {
+        l3go {
             res.srcDirs = ['go/res']
             java.srcDirs = ['go/src_flags']
             // Note: we are using the Home manifest here because the gradle manifest-merger uses
@@ -83,7 +83,7 @@ android {
             manifest.srcFile "AndroidManifest.xml"
         }
 
-        hgoAndroidTest {
+        l3goAndroidTest {
             manifest.srcFile "tests/AndroidManifest.xml"
         }
     }
