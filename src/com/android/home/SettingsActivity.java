@@ -97,9 +97,8 @@ public class SettingsActivity extends Activity {
             if (!Utilities.ATLEAST_OREO) {
                 getPreferenceScreen().removePreference(
                         findPreference(SessionCommitReceiver.ADD_ICON_PREFERENCE_KEY));
-            }
+                }
             if (!getResources().getBoolean(R.bool.notification_badging_enabled)) {
-            } else if (!getResources().getBoolean(R.bool.notification_badging_enabled)) {
                 getPreferenceScreen().removePreference(iconBadgingPref);
             } else {
                 // Listen to system notification badge settings while this UI is active.
@@ -177,7 +176,6 @@ public class SettingsActivity extends Activity {
         @Override
         public void onSettingChanged(boolean enabled) {
             int summary = enabled ? R.string.icon_badging_desc_on : R.string.icon_badging_desc_off;
-
 
             if (enabled) {
                 // Check if the listener is enabled or not.

@@ -8,6 +8,7 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.content.Context;
 import android.support.animation.SpringAnimation;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.view.inputmethod.InputMethodManager;
 
 import com.android.home.AbstractFloatingView;
 import com.android.home.Hotseat;
@@ -327,6 +329,8 @@ public class AllAppsTransitionController implements TouchController, SwipeDetect
      */
     public void preparePull(boolean start) {
         if (start) {
+            ((InputMethodManager) mLauncher.getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(mGradientView.getWindowToken(), 0);
             // Initialize values that should not change until #onDragEnd
             mStatusBarHeight = mLauncher.getDragLayer().getInsets().top;
             mHotseat.setVisibility(View.VISIBLE);

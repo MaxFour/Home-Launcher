@@ -21,6 +21,7 @@ import com.android.home.Utilities;
 import com.android.home.config.FeatureFlags;
 import com.android.home.graphics.IconNormalizer;
 import com.android.home.util.Preconditions;
+import com.android.home.features.ActionIntentFilter;
 
 import java.util.Collections;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class DynamicClock extends BroadcastReceiver
     private final Set<AutoUpdateClock> mUpdaters;
     private ClockLayers mLayers;
     private final Context mContext;
-
+    
     public DynamicClock(Context context) {
         mUpdaters = Collections.newSetFromMap(new WeakHashMap<AutoUpdateClock, Boolean>());
         mLayers = new ClockLayers();
@@ -41,8 +42,8 @@ public class DynamicClock extends BroadcastReceiver
         final Handler handler = new Handler(LauncherModel.getWorkerLooper());
         mContext.registerReceiver(this,
                 ActionIntentFilter.newInstance("com.google.android.deskclock",
-                        Intent.ACTION_PACKAGE_ADDED,
-                        Intent.ACTION_PACKAGE_CHANGED),
+                    Intent.ACTION_PACKAGE_ADDED,
+                    Intent.ACTION_PACKAGE_CHANGED),
                 null, handler);
         handler.post(new Runnable() {
             @Override
@@ -58,7 +59,7 @@ public class DynamicClock extends BroadcastReceiver
             }
         }, new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED), null, new Handler(Looper.getMainLooper()));
     }
-
+    
     public static Drawable getClock(Context context, int iconDpi) {
         ClockLayers clone = getClockLayers(context, iconDpi, false).clone();
         if (clone != null) {
@@ -67,7 +68,7 @@ public class DynamicClock extends BroadcastReceiver
         }
         return null;
     }
-
+    
     private static ClockLayers getClockLayers(Context context, int iconDpi, boolean normalizeIcon) {
         Preconditions.assertWorkerThread();
         ClockLayers layers = new ClockLayers();
@@ -112,7 +113,7 @@ public class DynamicClock extends BroadcastReceiver
         }
         return layers;
     }
-
+    
     private void loadTimeZone(String timeZoneId) {
         TimeZone timeZone = timeZoneId == null ?
                 TimeZone.getDefault() :
@@ -122,7 +123,7 @@ public class DynamicClock extends BroadcastReceiver
             a.setTimeZone(timeZone);
         }
     }
-
+    
     private void updateMainThread() {
         new MainThreadExecutor().execute(new Runnable() {
             @Override
@@ -133,14 +134,14 @@ public class DynamicClock extends BroadcastReceiver
             }
         });
     }
-
+    
     private void updateWrapper(ClockLayers wrapper) {
         this.mLayers = wrapper;
         for (AutoUpdateClock updater : mUpdaters) {
             updater.updateLayers(wrapper.clone());
         }
     }
-
+    
     public AutoUpdateClock drawIcon(Bitmap bitmap) {
         final AutoUpdateClock updater = new AutoUpdateClock(bitmap, mLayers.clone());
         mUpdaters.add(updater);

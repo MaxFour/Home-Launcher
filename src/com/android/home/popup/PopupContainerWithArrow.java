@@ -423,7 +423,6 @@ public class PopupContainerWithArrow extends AbstractFloatingView implements Dra
             }
             animateOpen();
         }
-
     }
 
     private void enforceContainedWithinScreen(int left, int right) {
