@@ -44,13 +44,14 @@
         android:persistent="true"
         />
 
-    <SwitchPreference
-        android:key="pref_dark_theme"
-        android:title="@string/enable_dark_theme_label"
-        android:summary="@string/enable_dark_theme_description"
-        android:defaultValue="@bool/dark_theme"
-        android:persistent="true"
-        />
+    <ListPreference
+        android:key="pref_theme"
+        android:title="@string/theme_title"
+        android:summary="%s"
+        android:entries="@array/theme"
+        android:entryValues="@array/theme_values"
+        android:defaultValue="0"/>
+
     <ListPreference
         android:key="pref_override_icon_shape"
         android:title="@string/icon_shape_override_label"

@@ -128,7 +128,8 @@
     <string name="shortcuts_menu_with_notifications_description" msgid="8985659504915468840">"Количество ярлыков для приложения \"<xliff:g id="APP_NAME">%3$s</xliff:g>\": <xliff:g id="NUMBER_OF_SHORTCUTS">%1$d</xliff:g>. Количество уведомлений: <xliff:g id="NUMBER_OF_NOTIFICATIONS">%2$d</xliff:g>."</string>
     <string name="action_dismiss_notification" msgid="5909461085055959187">"Закрыть"</string>
     <string name="notification_dismissed" msgid="6002233469409822874">"Уведомление закрыто"</string>
-    <string name="enable_dark_theme_label">Включить тёмную тему</string>
-    <string name="enable_dark_theme_description">Включить тёмную тему независимо от цвета обоев</string>
-
+    <string name="theme_title">Тема</string>
+    <string name="auto">Автоматически</string>
+    <string name="light">Светлая</string>
+    <string name="dark">Тёмная</string>
 </resources>

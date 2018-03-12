@@ -336,7 +336,6 @@ public class Launcher extends BaseActivity
 
     public ViewGroupFocusHelper mFocusHandler;
     private boolean mRotationEnabled = false;
-    private boolean mDarkThemeEnabled = false;
 
     @Thunk void setOrientation() {
         if (mRotationEnabled) {
@@ -348,7 +347,6 @@ public class Launcher extends BaseActivity
     }
 
     private RotationPrefChangeHandler mRotationPrefChangeHandler;
-    private DarkThemePrefChangeHandler mDarkThemePrefChangeHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -449,7 +447,7 @@ public class Launcher extends BaseActivity
             // Pages bound synchronously.
             mWorkspace.setCurrentPage(currentScreen);
 
-            setWorkspaceLoading(false);
+            setWorkspaceLoading(true);
         }
 
         // For handling default keys
@@ -474,14 +472,6 @@ public class Launcher extends BaseActivity
         // we want the screen to auto-rotate based on the current orientation
         setOrientation();
 
-        mDarkThemeEnabled = getResources().getBoolean(R.bool.dark_theme);
-
-        if (!mDarkThemeEnabled) {
-            mDarkThemeEnabled = Utilities.isDarkThemeEnabled(getApplicationContext());
-            mDarkThemePrefChangeHandler = new DarkThemePrefChangeHandler();
-            mSharedPrefs.registerOnSharedPreferenceChangeListener(mDarkThemePrefChangeHandler);
-        }
-
         setContentView(mLauncherView);
 
         // Listen for broadcasts
@@ -505,7 +495,11 @@ public class Launcher extends BaseActivity
     }
 
     protected void overrideTheme(boolean isDark, boolean supportsDarkText) {
-        if (isDark || Utilities.isDarkThemeEnabled(getApplicationContext())) {
+        String choice = Utilities.getPrefs(this)
+                        .getString(Utilities.KEY_THEME, String.valueOf(0));
+                int value = Integer.parseInt(choice);
+
+                if (isDark && value == 0 || value == 2) {
             setTheme(R.style.LauncherThemeDark);
         } else if (supportsDarkText) {
             setTheme(R.style.LauncherThemeDarkText);
@@ -1852,10 +1846,6 @@ public class Launcher extends BaseActivity
             mSharedPrefs.unregisterOnSharedPreferenceChangeListener(mRotationPrefChangeHandler);
         }
 
-        if (mDarkThemePrefChangeHandler != null) {
-            mSharedPrefs.unregisterOnSharedPreferenceChangeListener(mDarkThemePrefChangeHandler);
-        }
-
         try {
             mAppWidgetHost.stopListening();
         } catch (NullPointerException ex) {
@@ -2523,7 +2513,7 @@ public class Launcher extends BaseActivity
 
         String pickerPackage = getString(R.string.wallpaper_picker_package);
         boolean hasTargetPackage = !TextUtils.isEmpty(pickerPackage);
-        try {
+         try {
             if (hasTargetPackage && getPackageManager().getApplicationInfo(pickerPackage, 0).enabled) {
                 intent.setPackage(pickerPackage);
             }
@@ -4052,17 +4042,9 @@ public class Launcher extends BaseActivity
                 // Recreate the activity so that it initializes the rotation preference again.
                 recreate();
             }
-        }
-    }
-
-    private class DarkThemePrefChangeHandler implements OnSharedPreferenceChangeListener {
-
-        @Override
-        public void onSharedPreferenceChanged(
-                SharedPreferences sharedPreferences, String key) {
-            if (Utilities.ENABLE_DARK_THEME_KEY.equals(key)) {
-                recreate();
-            }
+            if (key.equals(Utilities.KEY_THEME)) {
+                    recreate();
+                }
         }
     }
 }
