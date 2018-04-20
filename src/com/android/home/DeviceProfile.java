@@ -184,8 +184,11 @@ public class DeviceProfile {
                 res.getDimensionPixelSize(R.dimen.dynamic_grid_cell_layout_padding);
         cellLayoutBottomPaddingPx =
                 res.getDimensionPixelSize(R.dimen.dynamic_grid_cell_layout_bottom_padding);
-        pageIndicatorSizePx = res.getDimensionPixelSize(
-                R.dimen.dynamic_grid_min_page_indicator_size);
+        boolean a = Utilities.getPrefs(context).getBoolean("pref_hotseat_show_arrow", true);
+        if (a) {
+            pageIndicatorSizePx = res.getDimensionPixelSize(R.dimen.dynamic_grid_min_page_indicator_size);
+        }
+        else pageIndicatorSizePx = 0;
         pageIndicatorLandLeftNavBarGutterPx = res.getDimensionPixelSize(
                 R.dimen.dynamic_grid_page_indicator_land_left_nav_bar_gutter_width);
         pageIndicatorLandRightNavBarGutterPx = res.getDimensionPixelSize(

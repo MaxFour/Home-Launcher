@@ -61,4 +61,8 @@
         android:defaultValue=""
         android:persistent="false" />
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="pref_hotseat_show_arrow"
+        android:title="@string/hotseat_show_arrow" />
 </PreferenceScreen>

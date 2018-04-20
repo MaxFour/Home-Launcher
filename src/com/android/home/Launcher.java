@@ -4045,6 +4045,10 @@ public class Launcher extends BaseActivity
             if (key.equals(Utilities.KEY_THEME)) {
                     recreate();
                 }
+            }
+            if (Utilities.PREF_HOTSEAT_SHOW_ARROW_KEY.equals(key)) {
+                needRestart();
+            }
         }
     }
 }
