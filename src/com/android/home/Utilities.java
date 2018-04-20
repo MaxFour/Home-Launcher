@@ -127,7 +127,6 @@ public final class Utilities {
 
     public static final String ALLOW_ROTATION_PREFERENCE_KEY = "pref_allowRotation";
 
-    public static final String KEY_THEME = "pref_theme";
     public static final String THEME_KEY = "pref_theme";
     public static final String PREF_HOTSEAT_SHOW_ARROW_KEY = "pref_hotseat_show_arrow";
 
@@ -150,6 +149,10 @@ public final class Utilities {
             return originalSmallestWidth >= 600;
         }
         return false;
+    }
+
+    public static void restartLauncher(Context context) {
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     /**
