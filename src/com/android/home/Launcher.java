@@ -497,6 +497,7 @@ public class Launcher extends BaseActivity
     protected void overrideTheme(boolean isDark, boolean supportsDarkText) {
         String choice = Utilities.getPrefs(this)
                         .getString(Utilities.KEY_THEME, String.valueOf(0));
+                        .getString(Utilities.THEME_KEY, String.valueOf(0));
                 int value = Integer.parseInt(choice);
 
                 if (isDark && value == 0 || value == 2) {
@@ -4043,6 +4044,7 @@ public class Launcher extends BaseActivity
                 recreate();
             }
             if (key.equals(Utilities.KEY_THEME)) {
+            if (key.equals(Utilities.THEME_KEY)) {
                     recreate();
                 }
             }

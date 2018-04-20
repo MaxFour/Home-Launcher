@@ -45,14 +45,6 @@
         />
 
     <ListPreference
-        android:key="pref_theme"
-        android:title="@string/theme_title"
-        android:summary="%s"
-        android:entries="@array/theme"
-        android:entryValues="@array/theme_values"
-        android:defaultValue="0"/>
-
-    <ListPreference
         android:key="pref_override_icon_shape"
         android:title="@string/icon_shape_override_label"
         android:summary="%s"
@@ -65,4 +57,13 @@
         android:defaultValue="true"
         android:key="pref_hotseat_show_arrow"
         android:title="@string/hotseat_show_arrow" />
+
+    <ListPreference
+        android:key="pref_theme"
+        android:title="@string/theme_title"
+        android:summary="%s"
+        android:entries="@array/theme"
+        android:entryValues="@array/theme_values"
+        android:defaultValue="0" />
+
 </PreferenceScreen>
