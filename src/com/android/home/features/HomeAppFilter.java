@@ -19,6 +19,9 @@ public class HomeAppFilter extends AppFilter {
 
         //Google Now Launcher
         mHideList.add(ComponentName.unflattenFromString("com.google.android.launcher/com.google.android.launcher.StubApp"));
+
+        //DocumentsUI
+        mHideList.add(ComponentName.unflattenFromString("com.android.documentsui/.LauncherActivity"));
     }
 
     @Override
