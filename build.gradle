@@ -48,7 +48,7 @@ android {
             testApplicationId 'com.android.home.tests'
         }
 
-        l3go {
+        hgo {
             applicationId 'com.android.home'
             testApplicationId 'com.android.home.tests'
         }
@@ -79,7 +79,7 @@ android {
             manifest.srcFile "tests/AndroidManifest.xml"
         }
 
-        l3go {
+        hgo {
             res.srcDirs = ['go/res']
             java.srcDirs = ['go/src_flags']
             // Note: we are using the Home manifest here because the gradle manifest-merger uses
@@ -87,7 +87,7 @@ android {
             manifest.srcFile "AndroidManifest.xml"
         }
 
-        l3goAndroidTest {
+        hgoAndroidTest {
             manifest.srcFile "tests/AndroidManifest.xml"
         }
     }
